@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 import type { Cliente } from '@prisma/client';
+import { validateCPF } from 'src/common/helpers/cpf-validator';
 
 @Injectable()
 export class ClienteService {
@@ -10,16 +11,36 @@ export class ClienteService {
     nome: string;
     cpf: string;
     telefone: string;
-  }): Promise<Cliente> {
-    return this.prisma.cliente.create({ data });
+  }): Promise<{ data: Cliente | null; message: string }> {
+    const cpf = data.cpf.replace(/\D/g, '');
+
+    if (!validateCPF(cpf)) {
+      return { data: null, message: 'CPF inválido' };
+    }
+
+    const existingCliente = await this.prisma.cliente.findUnique({
+      where: { cpf },
+    });
+
+    if (existingCliente) {
+      return { data: null, message: 'Cliente com este CPF já existe' };
+    }
+
+    const newCliente = await this.prisma.cliente.create({
+      data: {
+        nome: data.nome,
+        cpf: cpf,
+        telefone: data.telefone,
+      },
+    });
+    return {
+      data: newCliente,
+      message: '',
+    };
   }
 
-  async findAll(): Promise<Cliente[]> {
-    return this.prisma.cliente.findMany();
-  }
-
-  async findOne(id: number): Promise<Cliente | null> {
-    return this.prisma.cliente.findUnique({ where: { id } });
+  async findOne(cpf: string): Promise<Cliente | null> {
+    return this.prisma.cliente.findUnique({ where: { cpf } });
   }
 
   async update(
@@ -30,9 +51,5 @@ export class ClienteService {
       where: { id },
       data,
     });
-  }
-
-  async remove(id: number): Promise<Cliente> {
-    return this.prisma.cliente.delete({ where: { id } });
   }
 }

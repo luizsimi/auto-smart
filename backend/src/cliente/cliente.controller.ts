@@ -3,10 +3,10 @@ import {
   Get,
   Post,
   Put,
-  Delete,
   Param,
   Body,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { ClienteService } from './cliente.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -20,18 +20,19 @@ export class ClienteController {
   @Post()
   async create(
     @Body() data: { nome: string; cpf: string; telefone: string },
-  ): Promise<Cliente> {
-    return this.clienteService.create(data);
+  ): Promise<Cliente | { message: string } | null> {
+    const query = await this.clienteService.create(data);
+
+    if (query.message) {
+      throw new BadRequestException(query.message);
+    }
+
+    return query.data;
   }
 
-  @Get()
-  async findAll(): Promise<Cliente[]> {
-    return this.clienteService.findAll();
-  }
-
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Cliente | null> {
-    return this.clienteService.findOne(Number(id));
+  @Get(':cpf')
+  async findOne(@Param('cpf') cpf: string): Promise<Cliente | null> {
+    return this.clienteService.findOne(cpf);
   }
 
   @Put(':id')
@@ -40,10 +41,5 @@ export class ClienteController {
     @Body() data: Partial<{ nome: string; cpf: string; telefone: string }>,
   ): Promise<Cliente> {
     return this.clienteService.update(Number(id), data);
-  }
-
-  @Delete(':id')
-  async remove(@Param('id') id: string): Promise<Cliente> {
-    return this.clienteService.remove(Number(id));
   }
 }

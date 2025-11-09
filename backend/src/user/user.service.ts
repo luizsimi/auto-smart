@@ -12,9 +12,10 @@ export class UserService {
   async create(
     userData: Omit<User, 'id' | 'refreshToken' | 'levelAcesso'>,
   ): Promise<Partial<User>> {
+    const userCpf: string = userData.cpf.replace(/\D/g, '');
     const tempUser = await this.prisma.user.findFirst({
       where: {
-        OR: [{ email: userData.email }, { cpf: userData.cpf }],
+        OR: [{ email: userData.email }, { cpf: userCpf }],
       },
     });
 
@@ -26,7 +27,6 @@ export class UserService {
       throw new BadRequestException({ message: 'CPF inválido' });
     }
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const userCpf: string = userData.cpf.replace(/\D/g, '');
 
     try {
       const user: Partial<User> = await this.prisma.user.create({
