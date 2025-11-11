@@ -412,20 +412,30 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         child: child,
                       );
                     },
-                    child: Form(
-                      key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                    child: SizedBox(
+                      height: (screenHeight - (verticalPadding * 2))
+                          .clamp(0.0, double.infinity),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
                           // Logo com tamanho padronizado
                           Hero(
                             tag: 'logo',
-                            child: Image.asset(
-                      'assets/images/logo.png',
-                      width: logoSize,
-                      height: logoSize,
+                            child: Transform.scale(
+                              scale: 2.1,
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                width: logoSize,
+                                height: logoSize,
+                              ),
                             ),
-                    ),
+                          ),
                     SizedBox(height: screenHeight * 0.03), // Espaçamento balanceado entre logo e campos
                     
         // CPF field com acessibilidade
@@ -619,84 +629,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           ),
                           const SizedBox(height: 12),
                           
-                          // Lembrar-me e Esqueci senha
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Checkbox Lembrar-me
-                              Expanded(
-                                child: InkWell(
-                                  onTap: _isLoading ? null : () {
-                                    setState(() {
-                                      _rememberMe = !_rememberMe;
-                                    });
-                                    HapticFeedback.selectionClick();
-                                  },
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: Checkbox(
-                                            value: _rememberMe,
-                                            onChanged: _isLoading ? null : (value) {
-                                              setState(() {
-                                                _rememberMe = value ?? false;
-                                              });
-                                              HapticFeedback.selectionClick();
-                                            },
-                                            // Melhor contraste para acessibilidade
-                                            activeColor: Colors.white,
-                                            checkColor: AppColors.primary,
-                                            side: BorderSide(
-                                              color: Colors.white.withOpacity(0.9),
-                                              width: 2,
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(4),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        const Text(
-                                          'Lembrar-me',
-                                          style: TextStyle(
-                                            color: AppColors.white,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              
-                              // Link Esqueci senha
-                              TextButton(
-                                onPressed: _isLoading ? null : _showForgotPasswordDialog,
-                                style: TextButton.styleFrom(
-                                  foregroundColor: AppColors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 8,
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Esqueci minha senha',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                        
                           SizedBox(height: screenHeight * 0.025), // Espaçamento responsivo
                           
                           // Botão Entrar com acessibilidade
@@ -738,41 +671,50 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     ),
                           ),
                           
-                          // Botão de teste - apenas em desenvolvimento
-                          if (const bool.fromEnvironment('dart.vm.product') == false) ...[
-                    const SizedBox(height: 12),
-                    OutlinedButton(
-                              onPressed: _isLoading ? null : () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
-                          ),
-                        );
-                      },
-                      style: OutlinedButton.styleFrom(
-                                side: const BorderSide(
-                                  color: AppColors.white,
-                                  width: 1.5,
-                                ),
-                        foregroundColor: AppColors.white,
-                        minimumSize: const Size(double.infinity, 48),
-                        shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                                'Entrar (modo teste)',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                  // Botão de teste - apenas em desenvolvimento
+                                  if (const bool.fromEnvironment('dart.vm.product') ==
+                                      false) ...[
+                                    const SizedBox(height: 12),
+                                    OutlinedButton(
+                                      onPressed: _isLoading
+                                          ? null
+                                          : () {
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const HomeScreen(),
+                                                ),
+                                              );
+                                            },
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(
+                                          color: AppColors.white,
+                                          width: 1.5,
+                                        ),
+                                        foregroundColor: AppColors.white,
+                                        minimumSize:
+                                            const Size(double.infinity, 48),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Entrar (modo teste)',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+
+                                  // Espaçamento extra no final para balanço visual
+                                  SizedBox(height: screenHeight * 0.03),
+                                ],
                               ),
                             ),
-                          ],
-                          
-                          // Espaçamento extra no final para balanço visual
-                          SizedBox(height: screenHeight * 0.03),
+                          ),
                         ],
                       ),
                     ),
