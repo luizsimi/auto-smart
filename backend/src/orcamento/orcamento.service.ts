@@ -81,4 +81,56 @@ export class OrcamentoService {
       data: { status },
     });
   }
+
+  async getItens(idOrcamento: number): Promise<OrcamentoItem[]> {
+    return this.prisma.orcamentoItem.findMany({
+      where: { orcamentoId: idOrcamento },
+    });
+  }
+
+  async updateItens(
+    id: number,
+    itens: OrcamentoItem[],
+  ): Promise<OrcamentoItem[]> {
+    const orcamento = await this.findOne(id);
+
+    if (!orcamento) {
+      throw new Error('Orçamento não encontrado');
+    }
+
+    const orcamentosItems = await this.getItens(id);
+
+    if (!orcamentosItems) {
+      throw new Error('Itens do orçamento não encontrados');
+    }
+
+    if (orcamentosItems.length < itens.length) {
+      throw new Error(
+        'A quantidade de itens enviado excede a salva do orçamento',
+      );
+    }
+
+    //remover
+    console.log({ itens, orcamentosItems });
+
+    try {
+      const updated = await Promise.all(
+        itens.map((item) =>
+          this.prisma.orcamentoItem.update({
+            where: { id: item.id },
+            data: {
+              descricao: item.descricao,
+              tipoOrcamento: item.tipoOrcamento,
+              orcamentoValor: item.orcamentoValor,
+              ativo: item.ativo,
+            },
+          }),
+        ),
+      );
+
+      return updated;
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
+  }
 }

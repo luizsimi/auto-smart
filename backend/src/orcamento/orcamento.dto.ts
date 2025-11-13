@@ -7,8 +7,10 @@ import {
   IsString,
   ValidateNested,
   ArrayMinSize,
+  IsBoolean,
+  IsEnum,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { TipoOrcamento } from '@prisma/client';
 
 export class OrcamentoItemDto {
@@ -16,8 +18,10 @@ export class OrcamentoItemDto {
   @IsNotEmpty()
   descricao: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @Transform(({ value }) => String(value).toUpperCase())
+  @IsEnum(TipoOrcamento, {
+    message: `tipoOrcamento deve ser um dos seguintes valores: ${Object.values(TipoOrcamento).join(', ')}`,
+  })
   tipoOrcamento: TipoOrcamento;
 
   @IsNumber()
@@ -53,4 +57,42 @@ export class CreateOrcamentoDto {
   @ValidateNested()
   @Type(() => OrcamentoItensArrayDto)
   orcamentoItens: OrcamentoItensArrayDto;
+}
+
+export class updateOrcamentoItemDto {
+  @IsInt()
+  @IsPositive()
+  @IsNotEmpty()
+  id: number;
+
+  @IsInt()
+  @IsPositive()
+  @IsNotEmpty()
+  orcamentoId: number;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  ativo: boolean;
+
+  @IsString()
+  @IsNotEmpty()
+  descricao: string;
+
+  @Transform(({ value }) => String(value).toUpperCase())
+  @IsEnum(TipoOrcamento, {
+    message: `tipoOrcamento deve ser um dos seguintes valores: ${Object.values(TipoOrcamento).join(', ')}`,
+  })
+  tipoOrcamento: TipoOrcamento;
+
+  @IsNumber()
+  @IsPositive()
+  orcamentoValor: number;
+}
+
+export class UpdateOrcamentoItensDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => updateOrcamentoItemDto)
+  @ArrayMinSize(1, { message: 'Deve haver pelo menos um item no orçamento' })
+  itens: updateOrcamentoItemDto[];
 }

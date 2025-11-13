@@ -8,12 +8,17 @@ import {
   Query,
   UseGuards,
   Patch,
+  NotFoundException,
 } from '@nestjs/common';
 import { OrcamentoService } from './orcamento.service';
 import { Status, type Orcamento, type OrcamentoItem } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { OrcamentoDto, OrcamentoItensArrayDto } from './orcamento.dto';
+import {
+  OrcamentoDto,
+  OrcamentoItensArrayDto,
+  UpdateOrcamentoItensDto,
+} from './orcamento.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserService } from 'src/user/user.service';
 
@@ -58,6 +63,11 @@ export class OrcamentoController {
     });
   }
 
+  @Get(':id')
+  async findOne(@Param('id') id: number): Promise<Orcamento | null> {
+    return this.orcamentoService.findOne(id);
+  }
+
   @Get()
   async findAll(
     @Query('page') page = 1,
@@ -73,9 +83,33 @@ export class OrcamentoController {
 
   @Patch(':id/status')
   async updateStatus(@Param('id') id: number, @Body('status') status: Status) {
-    if (status === undefined) {
-      throw new BadRequestException('Status é obrigatório');
+    if (status === undefined)
+      throw new BadRequestException('status é obrigatório');
+
+    try {
+      return await this.orcamentoService.updateStatus(id, status);
+    } catch (error: unknown) {
+      throw new NotFoundException(
+        (error as Error).message || 'Erro ao atualizar status',
+      );
     }
-    return this.orcamentoService.updateStatus(id, status);
+  }
+
+  @Patch(':id/itens')
+  async updateItens(
+    @Param('id') id: number,
+    @Body() body: UpdateOrcamentoItensDto,
+  ): Promise<OrcamentoItem[]> {
+    if (!id) throw new BadRequestException('ID do orçamento é obrigatório');
+
+    const { itens } = body;
+
+    try {
+      return await this.orcamentoService.updateItens(id, itens);
+    } catch (error: unknown) {
+      throw new BadRequestException(
+        (error as Error).message || 'Erro ao atualizar itens',
+      );
+    }
   }
 }

@@ -7,6 +7,7 @@ import {
   Body,
   UseGuards,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ClienteService } from './cliente.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -32,7 +33,9 @@ export class ClienteController {
 
   @Get(':cpf')
   async findOne(@Param('cpf') cpf: string): Promise<Cliente | null> {
-    return this.clienteService.findOne(cpf);
+    const result = await this.clienteService.findOne(cpf);
+    if (!result) throw new NotFoundException();
+    return result;
   }
 
   @Put(':id')
