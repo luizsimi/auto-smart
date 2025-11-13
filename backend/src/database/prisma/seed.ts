@@ -9,11 +9,11 @@ const prisma = new PrismaClient();
 
 async function main() {
   // data cleanup
+  await prisma.orcamentoItem.deleteMany();
+  await prisma.orcamento.deleteMany();
   await prisma.cliente.deleteMany();
   await prisma.user.deleteMany();
   await prisma.store.deleteMany();
-  await prisma.orcamento.deleteMany();
-  await prisma.orcamentoItem.deleteMany();
 
   //create a store
   const store = await prisma.store.create({
@@ -41,7 +41,7 @@ async function main() {
   const cliente = await prisma.cliente.create({
     data: {
       nome: 'João da Silva',
-      cpf: '252.826.040-78',
+      cpf: '25282604078',
       telefone: '11999999999',
     },
   });
