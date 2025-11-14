@@ -31,11 +31,31 @@ export class ClienteController {
     return query.data;
   }
 
+  // Busca um cliente por CPF antes do orçamento !!
   @Get(':cpf')
-  async findOne(@Param('cpf') cpf: string): Promise<Cliente | null> {
-    const result = await this.clienteService.findOne(cpf);
-    if (!result) throw new NotFoundException();
-    return result;
+
+  // COMENTADO TEMPORARIAMENTE ATÉ RESOLVER O CONFLITO ==================================================
+  // async findOneStatus(@Param('cpf') cpf: string): Promise<Cliente | null> {
+  //   const result = await this.clienteService.findOne(cpf);
+  //   if (!result) throw new NotFoundException();
+  //   return result;
+
+  //   }
+    
+    async findOne(@Param('cpf') cpf: string): Promise<Cliente> {
+    const sanitizedCpf = cpf.replace(/\D/g, '');
+
+    if (sanitizedCpf.length !== 11) {
+      throw new BadRequestException('CPF inválido');
+    }
+
+    const cliente = await this.clienteService.findOne(sanitizedCpf);
+
+    if (!cliente) {
+      throw new NotFoundException(`Cliente com CPF ${cpf} não encontrado`);
+    }
+
+    return cliente;
   }
 
   @Put(':id')
