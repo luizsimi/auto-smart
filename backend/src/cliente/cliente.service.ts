@@ -39,11 +39,8 @@ export class ClienteService {
     };
   }
 
-  // Busca um cliente por CPF antes do orçamento !!
   async findOne(cpf: string): Promise<Cliente | null> {
-    return this.prisma.cliente.findUnique({
-      where: { cpf },
-    });
+    return this.prisma.cliente.findUnique({ where: { cpf } });
   }
 
   async update(
