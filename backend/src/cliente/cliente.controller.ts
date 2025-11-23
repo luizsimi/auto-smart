@@ -8,78 +8,41 @@ import {
   UseGuards,
   BadRequestException,
   NotFoundException,
-  ParseIntPipe,
 } from '@nestjs/common';
-
 import { ClienteService } from './cliente.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Cliente } from '@prisma/client';
 
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiBody,
-} from '@nestjs/swagger';
-
-import { CreateClienteDto } from './cliente.dto';
-import { UpdateClienteDto } from './cliente.update.dto';
-
-@ApiTags('Clientes')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard) // protege todos os endpoints
 @Controller('clientes')
 export class ClienteController {
   constructor(private readonly clienteService: ClienteService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Cria um novo cliente' })
-  @ApiResponse({ status: 201, description: 'Cliente criado com sucesso' })
-  @ApiResponse({
-    status: 400,
-    description: 'CPF inválido ou cliente já existe',
-  })
-  @ApiBody({ type: CreateClienteDto })
-  async create(@Body() data: CreateClienteDto): Promise<Cliente> {
-    const result = await this.clienteService.create(data);
+  async create(
+    @Body() data: { nome: string; cpf: string; telefone: string },
+  ): Promise<Cliente | { message: string } | null> {
+    const query = await this.clienteService.create(data);
 
-    if (result.message) {
-      throw new BadRequestException(result.message);
+    if (query.message) {
+      throw new BadRequestException(query.message);
     }
 
-    return result.data as Cliente;
+    return query.data;
   }
 
   @Get(':cpf')
-  @ApiOperation({ summary: 'Busca um cliente pelo CPF' })
-  @ApiResponse({ status: 200, description: 'Cliente encontrado' })
-  @ApiResponse({ status: 404, description: 'Cliente não encontrado' })
-  @ApiParam({ name: 'cpf', example: '12345678900' })
-  async findOne(@Param('cpf') cpf: string): Promise<Cliente> {
-    const sanitizedCpf = cpf.replace(/\D/g, '');
-
-    if (sanitizedCpf.length !== 11) {
-      throw new BadRequestException('CPF inválido');
-    }
-
-    const cliente = await this.clienteService.findOne(sanitizedCpf);
-
-    if (!cliente) {
-      throw new NotFoundException(`Cliente com CPF ${cpf} não encontrado`);
-    }
-
-    return cliente;
+  async findOne(@Param('cpf') cpf: string): Promise<Cliente | null> {
+    const result = await this.clienteService.findOne(cpf);
+    if (!result) throw new NotFoundException();
+    return result;
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Atualiza um cliente' })
-  @ApiResponse({ status: 200, description: 'Cliente atualizado com sucesso' })
-  @ApiParam({ name: 'id', example: 1 })
-  @ApiBody({ type: UpdateClienteDto })
   async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: UpdateClienteDto,
+    @Param('id') id: string,
+    @Body() data: Partial<{ nome: string; cpf: string; telefone: string }>,
   ): Promise<Cliente> {
-    return this.clienteService.update(id, data);
+    return this.clienteService.update(Number(id), data);
   }
 }
