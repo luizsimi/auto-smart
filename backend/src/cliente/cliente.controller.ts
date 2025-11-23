@@ -25,7 +25,6 @@ import {
 
 import { CreateClienteDto } from './cliente.dto';
 import { UpdateClienteDto } from './cliente.update.dto';
-import { validateCPF } from 'src/common/helpers/cpf-validator';
 
 @ApiTags('Clientes')
 @UseGuards(JwtAuthGuard)
@@ -59,20 +58,19 @@ export class ClienteController {
   async findOne(@Param('cpf') cpf: string): Promise<Cliente> {
     const sanitizedCpf = cpf.replace(/\D/g, '');
 
-    if (!validateCPF(sanitizedCpf)) {
+    if (sanitizedCpf.length !== 11) {
       throw new BadRequestException('CPF inválido');
     }
 
     const cliente = await this.clienteService.findOne(sanitizedCpf);
 
     if (!cliente) {
-      throw new NotFoundException(
-        `Cliente com CPF ${sanitizedCpf} não encontrado`,
-      );
+      throw new NotFoundException(`Cliente com CPF ${cpf} não encontrado`);
     }
 
     return cliente;
   }
+
   @Put(':id')
   @ApiOperation({ summary: 'Atualiza um cliente' })
   @ApiResponse({ status: 200, description: 'Cliente atualizado com sucesso' })
