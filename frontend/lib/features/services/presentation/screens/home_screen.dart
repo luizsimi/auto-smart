@@ -232,8 +232,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   phone: orcamento.cliente?.telefone ?? 'N/A',
                                   status: statusMap['text'] as String,
                                   statusColor: statusMap['color'] as Color,
-                                  onTap: () {
-                                    Navigator.push(
+                                  onTap: () async {
+                                    final result = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
@@ -252,6 +252,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
                                     );
+                                    
+                                    if (result == true) {
+                                      _loadOrcamentos();
+                                    }
                                   },
                                 );
                               },

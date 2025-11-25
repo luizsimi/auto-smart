@@ -8,6 +8,7 @@ import {
   Query,
   UseGuards,
   Patch,
+  Delete,
   NotFoundException,
 } from '@nestjs/common';
 import { OrcamentoService } from './orcamento.service';
@@ -130,6 +131,23 @@ export class OrcamentoController {
     } catch (error: unknown) {
       throw new BadRequestException(
         (error as Error).message || 'Erro ao atualizar itens',
+      );
+    }
+  }
+
+  @Delete(':id')
+  @ApiOperation({
+    summary: 'Exclui um orçamento',
+  })
+  @ApiParam({ name: 'id', type: Number, example: 1 })
+  @ApiResponse({ status: 200, description: 'Orçamento excluído com sucesso' })
+  @ApiResponse({ status: 404, description: 'Orçamento não encontrado' })
+  async remove(@Param('id') id: number): Promise<Orcamento> {
+    try {
+      return await this.orcamentoService.remove(Number(id));
+    } catch (error: unknown) {
+      throw new NotFoundException(
+        (error as Error).message || 'Erro ao excluir orçamento',
       );
     }
   }

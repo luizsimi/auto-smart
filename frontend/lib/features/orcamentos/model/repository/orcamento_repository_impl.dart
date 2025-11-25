@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../create_orcamento_request.dart';
 import '../orcamento_model.dart';
+import '../orcamento_item_model.dart';
 import 'orcamento_repository.dart';
 
 const String _envApiBaseUrl =
@@ -128,5 +129,97 @@ class OrcamentoRepositoryImpl implements OrcamentoRepository {
     }
 
     throw Exception('Formato inesperado da resposta ao criar orçamento');
+  }
+
+  @override
+  Future<OrcamentoModel> findOne(int id) async {
+    final uri = _buildUri('/orcamentos/$id');
+    final response = await _client.get(uri, headers: await _buildHeaders());
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Erro ao buscar orçamento: ${response.statusCode} ${response.reasonPhrase}',
+      );
+    }
+
+    final dynamic decoded = jsonDecode(response.body);
+    if (decoded is Map<String, dynamic>) {
+      return OrcamentoModel.fromJson(decoded);
+    }
+
+    throw Exception('Formato inesperado da resposta de /orcamentos/$id');
+  }
+
+  @override
+  Future<OrcamentoModel> updateStatus(int id, String status) async {
+    final uri = _buildUri('/orcamentos/$id/status');
+    final response = await _client.patch(
+      uri,
+      headers: await _buildHeaders(),
+      body: jsonEncode({'status': status}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Erro ao atualizar status: ${response.statusCode} ${response.body}',
+      );
+    }
+
+    final dynamic decoded = jsonDecode(response.body);
+    if (decoded is Map<String, dynamic>) {
+      return OrcamentoModel.fromJson(decoded);
+    }
+
+    throw Exception('Formato inesperado da resposta ao atualizar status');
+  }
+
+  @override
+  Future<List<OrcamentoItemModel>> updateItens(
+    int id,
+    List<OrcamentoItemModel> itens,
+  ) async {
+    final uri = _buildUri('/orcamentos/$id/itens');
+    final itensJson = itens.map((item) => {
+      'id': item.id,
+      'orcamentoId': item.orcamentoId,
+      'ativo': item.ativo,
+      'descricao': item.descricao,
+      'tipoOrcamento': item.tipoOrcamento,
+      'orcamentoValor': item.valor,
+    }).toList();
+
+    final response = await _client.patch(
+      uri,
+      headers: await _buildHeaders(),
+      body: jsonEncode({'itens': itensJson}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Erro ao atualizar itens: ${response.statusCode} ${response.body}',
+      );
+    }
+
+    final dynamic decoded = jsonDecode(response.body);
+    if (decoded is List) {
+      return decoded
+          .map((item) =>
+              OrcamentoItemModel.fromJson(item as Map<String, dynamic>))
+          .toList();
+    }
+
+    throw Exception('Formato inesperado da resposta ao atualizar itens');
+  }
+
+  @override
+  Future<void> deleteOrcamento(int id) async {
+    final uri = _buildUri('/orcamentos/$id');
+    final response = await _client.delete(uri, headers: await _buildHeaders());
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(
+        'Erro ao excluir orçamento: ${response.statusCode} ${response.body}',
+      );
+    }
   }
 }
