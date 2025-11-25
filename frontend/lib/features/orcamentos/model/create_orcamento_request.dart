@@ -16,13 +16,34 @@ class CreateOrcamentoItemRequest with _$CreateOrcamentoItemRequest {
 }
 
 @freezed
-class CreateOrcamentoRequest with _$CreateOrcamentoRequest {
-  const factory CreateOrcamentoRequest({
+class OrcamentoData with _$OrcamentoData {
+  const factory OrcamentoData({
     @JsonKey(name: 'clienteId') required int clienteId,
     required String placa,
     required String modelo,
+  }) = _OrcamentoData;
+
+  factory OrcamentoData.fromJson(Map<String, dynamic> json) =>
+      _$OrcamentoDataFromJson(json);
+}
+
+@freezed
+class OrcamentoItensWrapper with _$OrcamentoItensWrapper {
+  const factory OrcamentoItensWrapper({
     @JsonKey(name: 'orcamentoItens')
-    required List<CreateOrcamentoItemRequest> itens,
+    required List<CreateOrcamentoItemRequest> orcamentoItens,
+  }) = _OrcamentoItensWrapper;
+
+  factory OrcamentoItensWrapper.fromJson(Map<String, dynamic> json) =>
+      _$OrcamentoItensWrapperFromJson(json);
+}
+
+@freezed
+class CreateOrcamentoRequest with _$CreateOrcamentoRequest {
+  const factory CreateOrcamentoRequest({
+    @JsonKey(name: 'Orcamento') required OrcamentoData orcamento,
+    @JsonKey(name: 'orcamentoItens')
+    required OrcamentoItensWrapper orcamentoItens,
   }) = _CreateOrcamentoRequest;
 
   factory CreateOrcamentoRequest.fromJson(Map<String, dynamic> json) =>

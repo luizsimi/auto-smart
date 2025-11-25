@@ -244,6 +244,401 @@ abstract class _CreateOrcamentoItemRequest
   get copyWith => throw _privateConstructorUsedError;
 }
 
+OrcamentoData _$OrcamentoDataFromJson(Map<String, dynamic> json) {
+  return _OrcamentoData.fromJson(json);
+}
+
+/// @nodoc
+mixin _$OrcamentoData {
+  @JsonKey(name: 'clienteId')
+  int get clienteId => throw _privateConstructorUsedError;
+  String get placa => throw _privateConstructorUsedError;
+  String get modelo => throw _privateConstructorUsedError;
+
+  /// Serializes this OrcamentoData to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of OrcamentoData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $OrcamentoDataCopyWith<OrcamentoData> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $OrcamentoDataCopyWith<$Res> {
+  factory $OrcamentoDataCopyWith(
+    OrcamentoData value,
+    $Res Function(OrcamentoData) then,
+  ) = _$OrcamentoDataCopyWithImpl<$Res, OrcamentoData>;
+  @useResult
+  $Res call({
+    @JsonKey(name: 'clienteId') int clienteId,
+    String placa,
+    String modelo,
+  });
+}
+
+/// @nodoc
+class _$OrcamentoDataCopyWithImpl<$Res, $Val extends OrcamentoData>
+    implements $OrcamentoDataCopyWith<$Res> {
+  _$OrcamentoDataCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of OrcamentoData
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? clienteId = null,
+    Object? placa = null,
+    Object? modelo = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            clienteId: null == clienteId
+                ? _value.clienteId
+                : clienteId // ignore: cast_nullable_to_non_nullable
+                      as int,
+            placa: null == placa
+                ? _value.placa
+                : placa // ignore: cast_nullable_to_non_nullable
+                      as String,
+            modelo: null == modelo
+                ? _value.modelo
+                : modelo // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$OrcamentoDataImplCopyWith<$Res>
+    implements $OrcamentoDataCopyWith<$Res> {
+  factory _$$OrcamentoDataImplCopyWith(
+    _$OrcamentoDataImpl value,
+    $Res Function(_$OrcamentoDataImpl) then,
+  ) = __$$OrcamentoDataImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    @JsonKey(name: 'clienteId') int clienteId,
+    String placa,
+    String modelo,
+  });
+}
+
+/// @nodoc
+class __$$OrcamentoDataImplCopyWithImpl<$Res>
+    extends _$OrcamentoDataCopyWithImpl<$Res, _$OrcamentoDataImpl>
+    implements _$$OrcamentoDataImplCopyWith<$Res> {
+  __$$OrcamentoDataImplCopyWithImpl(
+    _$OrcamentoDataImpl _value,
+    $Res Function(_$OrcamentoDataImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of OrcamentoData
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? clienteId = null,
+    Object? placa = null,
+    Object? modelo = null,
+  }) {
+    return _then(
+      _$OrcamentoDataImpl(
+        clienteId: null == clienteId
+            ? _value.clienteId
+            : clienteId // ignore: cast_nullable_to_non_nullable
+                  as int,
+        placa: null == placa
+            ? _value.placa
+            : placa // ignore: cast_nullable_to_non_nullable
+                  as String,
+        modelo: null == modelo
+            ? _value.modelo
+            : modelo // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$OrcamentoDataImpl implements _OrcamentoData {
+  const _$OrcamentoDataImpl({
+    @JsonKey(name: 'clienteId') required this.clienteId,
+    required this.placa,
+    required this.modelo,
+  });
+
+  factory _$OrcamentoDataImpl.fromJson(Map<String, dynamic> json) =>
+      _$$OrcamentoDataImplFromJson(json);
+
+  @override
+  @JsonKey(name: 'clienteId')
+  final int clienteId;
+  @override
+  final String placa;
+  @override
+  final String modelo;
+
+  @override
+  String toString() {
+    return 'OrcamentoData(clienteId: $clienteId, placa: $placa, modelo: $modelo)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$OrcamentoDataImpl &&
+            (identical(other.clienteId, clienteId) ||
+                other.clienteId == clienteId) &&
+            (identical(other.placa, placa) || other.placa == placa) &&
+            (identical(other.modelo, modelo) || other.modelo == modelo));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, clienteId, placa, modelo);
+
+  /// Create a copy of OrcamentoData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$OrcamentoDataImplCopyWith<_$OrcamentoDataImpl> get copyWith =>
+      __$$OrcamentoDataImplCopyWithImpl<_$OrcamentoDataImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$OrcamentoDataImplToJson(this);
+  }
+}
+
+abstract class _OrcamentoData implements OrcamentoData {
+  const factory _OrcamentoData({
+    @JsonKey(name: 'clienteId') required final int clienteId,
+    required final String placa,
+    required final String modelo,
+  }) = _$OrcamentoDataImpl;
+
+  factory _OrcamentoData.fromJson(Map<String, dynamic> json) =
+      _$OrcamentoDataImpl.fromJson;
+
+  @override
+  @JsonKey(name: 'clienteId')
+  int get clienteId;
+  @override
+  String get placa;
+  @override
+  String get modelo;
+
+  /// Create a copy of OrcamentoData
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$OrcamentoDataImplCopyWith<_$OrcamentoDataImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+OrcamentoItensWrapper _$OrcamentoItensWrapperFromJson(
+  Map<String, dynamic> json,
+) {
+  return _OrcamentoItensWrapper.fromJson(json);
+}
+
+/// @nodoc
+mixin _$OrcamentoItensWrapper {
+  @JsonKey(name: 'orcamentoItens')
+  List<CreateOrcamentoItemRequest> get orcamentoItens =>
+      throw _privateConstructorUsedError;
+
+  /// Serializes this OrcamentoItensWrapper to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of OrcamentoItensWrapper
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $OrcamentoItensWrapperCopyWith<OrcamentoItensWrapper> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $OrcamentoItensWrapperCopyWith<$Res> {
+  factory $OrcamentoItensWrapperCopyWith(
+    OrcamentoItensWrapper value,
+    $Res Function(OrcamentoItensWrapper) then,
+  ) = _$OrcamentoItensWrapperCopyWithImpl<$Res, OrcamentoItensWrapper>;
+  @useResult
+  $Res call({
+    @JsonKey(name: 'orcamentoItens')
+    List<CreateOrcamentoItemRequest> orcamentoItens,
+  });
+}
+
+/// @nodoc
+class _$OrcamentoItensWrapperCopyWithImpl<
+  $Res,
+  $Val extends OrcamentoItensWrapper
+>
+    implements $OrcamentoItensWrapperCopyWith<$Res> {
+  _$OrcamentoItensWrapperCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of OrcamentoItensWrapper
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? orcamentoItens = null}) {
+    return _then(
+      _value.copyWith(
+            orcamentoItens: null == orcamentoItens
+                ? _value.orcamentoItens
+                : orcamentoItens // ignore: cast_nullable_to_non_nullable
+                      as List<CreateOrcamentoItemRequest>,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$OrcamentoItensWrapperImplCopyWith<$Res>
+    implements $OrcamentoItensWrapperCopyWith<$Res> {
+  factory _$$OrcamentoItensWrapperImplCopyWith(
+    _$OrcamentoItensWrapperImpl value,
+    $Res Function(_$OrcamentoItensWrapperImpl) then,
+  ) = __$$OrcamentoItensWrapperImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    @JsonKey(name: 'orcamentoItens')
+    List<CreateOrcamentoItemRequest> orcamentoItens,
+  });
+}
+
+/// @nodoc
+class __$$OrcamentoItensWrapperImplCopyWithImpl<$Res>
+    extends
+        _$OrcamentoItensWrapperCopyWithImpl<$Res, _$OrcamentoItensWrapperImpl>
+    implements _$$OrcamentoItensWrapperImplCopyWith<$Res> {
+  __$$OrcamentoItensWrapperImplCopyWithImpl(
+    _$OrcamentoItensWrapperImpl _value,
+    $Res Function(_$OrcamentoItensWrapperImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of OrcamentoItensWrapper
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? orcamentoItens = null}) {
+    return _then(
+      _$OrcamentoItensWrapperImpl(
+        orcamentoItens: null == orcamentoItens
+            ? _value._orcamentoItens
+            : orcamentoItens // ignore: cast_nullable_to_non_nullable
+                  as List<CreateOrcamentoItemRequest>,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$OrcamentoItensWrapperImpl implements _OrcamentoItensWrapper {
+  const _$OrcamentoItensWrapperImpl({
+    @JsonKey(name: 'orcamentoItens')
+    required final List<CreateOrcamentoItemRequest> orcamentoItens,
+  }) : _orcamentoItens = orcamentoItens;
+
+  factory _$OrcamentoItensWrapperImpl.fromJson(Map<String, dynamic> json) =>
+      _$$OrcamentoItensWrapperImplFromJson(json);
+
+  final List<CreateOrcamentoItemRequest> _orcamentoItens;
+  @override
+  @JsonKey(name: 'orcamentoItens')
+  List<CreateOrcamentoItemRequest> get orcamentoItens {
+    if (_orcamentoItens is EqualUnmodifiableListView) return _orcamentoItens;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_orcamentoItens);
+  }
+
+  @override
+  String toString() {
+    return 'OrcamentoItensWrapper(orcamentoItens: $orcamentoItens)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$OrcamentoItensWrapperImpl &&
+            const DeepCollectionEquality().equals(
+              other._orcamentoItens,
+              _orcamentoItens,
+            ));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    const DeepCollectionEquality().hash(_orcamentoItens),
+  );
+
+  /// Create a copy of OrcamentoItensWrapper
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$OrcamentoItensWrapperImplCopyWith<_$OrcamentoItensWrapperImpl>
+  get copyWith =>
+      __$$OrcamentoItensWrapperImplCopyWithImpl<_$OrcamentoItensWrapperImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$OrcamentoItensWrapperImplToJson(this);
+  }
+}
+
+abstract class _OrcamentoItensWrapper implements OrcamentoItensWrapper {
+  const factory _OrcamentoItensWrapper({
+    @JsonKey(name: 'orcamentoItens')
+    required final List<CreateOrcamentoItemRequest> orcamentoItens,
+  }) = _$OrcamentoItensWrapperImpl;
+
+  factory _OrcamentoItensWrapper.fromJson(Map<String, dynamic> json) =
+      _$OrcamentoItensWrapperImpl.fromJson;
+
+  @override
+  @JsonKey(name: 'orcamentoItens')
+  List<CreateOrcamentoItemRequest> get orcamentoItens;
+
+  /// Create a copy of OrcamentoItensWrapper
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$OrcamentoItensWrapperImplCopyWith<_$OrcamentoItensWrapperImpl>
+  get copyWith => throw _privateConstructorUsedError;
+}
+
 CreateOrcamentoRequest _$CreateOrcamentoRequestFromJson(
   Map<String, dynamic> json,
 ) {
@@ -252,12 +647,10 @@ CreateOrcamentoRequest _$CreateOrcamentoRequestFromJson(
 
 /// @nodoc
 mixin _$CreateOrcamentoRequest {
-  @JsonKey(name: 'clienteId')
-  int get clienteId => throw _privateConstructorUsedError;
-  String get placa => throw _privateConstructorUsedError;
-  String get modelo => throw _privateConstructorUsedError;
+  @JsonKey(name: 'Orcamento')
+  OrcamentoData get orcamento => throw _privateConstructorUsedError;
   @JsonKey(name: 'orcamentoItens')
-  List<CreateOrcamentoItemRequest> get itens =>
+  OrcamentoItensWrapper get orcamentoItens =>
       throw _privateConstructorUsedError;
 
   /// Serializes this CreateOrcamentoRequest to a JSON map.
@@ -278,11 +671,12 @@ abstract class $CreateOrcamentoRequestCopyWith<$Res> {
   ) = _$CreateOrcamentoRequestCopyWithImpl<$Res, CreateOrcamentoRequest>;
   @useResult
   $Res call({
-    @JsonKey(name: 'clienteId') int clienteId,
-    String placa,
-    String modelo,
-    @JsonKey(name: 'orcamentoItens') List<CreateOrcamentoItemRequest> itens,
+    @JsonKey(name: 'Orcamento') OrcamentoData orcamento,
+    @JsonKey(name: 'orcamentoItens') OrcamentoItensWrapper orcamentoItens,
   });
+
+  $OrcamentoDataCopyWith<$Res> get orcamento;
+  $OrcamentoItensWrapperCopyWith<$Res> get orcamentoItens;
 }
 
 /// @nodoc
@@ -302,33 +696,40 @@ class _$CreateOrcamentoRequestCopyWithImpl<
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? clienteId = null,
-    Object? placa = null,
-    Object? modelo = null,
-    Object? itens = null,
-  }) {
+  $Res call({Object? orcamento = null, Object? orcamentoItens = null}) {
     return _then(
       _value.copyWith(
-            clienteId: null == clienteId
-                ? _value.clienteId
-                : clienteId // ignore: cast_nullable_to_non_nullable
-                      as int,
-            placa: null == placa
-                ? _value.placa
-                : placa // ignore: cast_nullable_to_non_nullable
-                      as String,
-            modelo: null == modelo
-                ? _value.modelo
-                : modelo // ignore: cast_nullable_to_non_nullable
-                      as String,
-            itens: null == itens
-                ? _value.itens
-                : itens // ignore: cast_nullable_to_non_nullable
-                      as List<CreateOrcamentoItemRequest>,
+            orcamento: null == orcamento
+                ? _value.orcamento
+                : orcamento // ignore: cast_nullable_to_non_nullable
+                      as OrcamentoData,
+            orcamentoItens: null == orcamentoItens
+                ? _value.orcamentoItens
+                : orcamentoItens // ignore: cast_nullable_to_non_nullable
+                      as OrcamentoItensWrapper,
           )
           as $Val,
     );
+  }
+
+  /// Create a copy of CreateOrcamentoRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OrcamentoDataCopyWith<$Res> get orcamento {
+    return $OrcamentoDataCopyWith<$Res>(_value.orcamento, (value) {
+      return _then(_value.copyWith(orcamento: value) as $Val);
+    });
+  }
+
+  /// Create a copy of CreateOrcamentoRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OrcamentoItensWrapperCopyWith<$Res> get orcamentoItens {
+    return $OrcamentoItensWrapperCopyWith<$Res>(_value.orcamentoItens, (value) {
+      return _then(_value.copyWith(orcamentoItens: value) as $Val);
+    });
   }
 }
 
@@ -342,11 +743,14 @@ abstract class _$$CreateOrcamentoRequestImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    @JsonKey(name: 'clienteId') int clienteId,
-    String placa,
-    String modelo,
-    @JsonKey(name: 'orcamentoItens') List<CreateOrcamentoItemRequest> itens,
+    @JsonKey(name: 'Orcamento') OrcamentoData orcamento,
+    @JsonKey(name: 'orcamentoItens') OrcamentoItensWrapper orcamentoItens,
   });
+
+  @override
+  $OrcamentoDataCopyWith<$Res> get orcamento;
+  @override
+  $OrcamentoItensWrapperCopyWith<$Res> get orcamentoItens;
 }
 
 /// @nodoc
@@ -363,30 +767,17 @@ class __$$CreateOrcamentoRequestImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? clienteId = null,
-    Object? placa = null,
-    Object? modelo = null,
-    Object? itens = null,
-  }) {
+  $Res call({Object? orcamento = null, Object? orcamentoItens = null}) {
     return _then(
       _$CreateOrcamentoRequestImpl(
-        clienteId: null == clienteId
-            ? _value.clienteId
-            : clienteId // ignore: cast_nullable_to_non_nullable
-                  as int,
-        placa: null == placa
-            ? _value.placa
-            : placa // ignore: cast_nullable_to_non_nullable
-                  as String,
-        modelo: null == modelo
-            ? _value.modelo
-            : modelo // ignore: cast_nullable_to_non_nullable
-                  as String,
-        itens: null == itens
-            ? _value._itens
-            : itens // ignore: cast_nullable_to_non_nullable
-                  as List<CreateOrcamentoItemRequest>,
+        orcamento: null == orcamento
+            ? _value.orcamento
+            : orcamento // ignore: cast_nullable_to_non_nullable
+                  as OrcamentoData,
+        orcamentoItens: null == orcamentoItens
+            ? _value.orcamentoItens
+            : orcamentoItens // ignore: cast_nullable_to_non_nullable
+                  as OrcamentoItensWrapper,
       ),
     );
   }
@@ -396,35 +787,23 @@ class __$$CreateOrcamentoRequestImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CreateOrcamentoRequestImpl implements _CreateOrcamentoRequest {
   const _$CreateOrcamentoRequestImpl({
-    @JsonKey(name: 'clienteId') required this.clienteId,
-    required this.placa,
-    required this.modelo,
-    @JsonKey(name: 'orcamentoItens')
-    required final List<CreateOrcamentoItemRequest> itens,
-  }) : _itens = itens;
+    @JsonKey(name: 'Orcamento') required this.orcamento,
+    @JsonKey(name: 'orcamentoItens') required this.orcamentoItens,
+  });
 
   factory _$CreateOrcamentoRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$CreateOrcamentoRequestImplFromJson(json);
 
   @override
-  @JsonKey(name: 'clienteId')
-  final int clienteId;
-  @override
-  final String placa;
-  @override
-  final String modelo;
-  final List<CreateOrcamentoItemRequest> _itens;
+  @JsonKey(name: 'Orcamento')
+  final OrcamentoData orcamento;
   @override
   @JsonKey(name: 'orcamentoItens')
-  List<CreateOrcamentoItemRequest> get itens {
-    if (_itens is EqualUnmodifiableListView) return _itens;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_itens);
-  }
+  final OrcamentoItensWrapper orcamentoItens;
 
   @override
   String toString() {
-    return 'CreateOrcamentoRequest(clienteId: $clienteId, placa: $placa, modelo: $modelo, itens: $itens)';
+    return 'CreateOrcamentoRequest(orcamento: $orcamento, orcamentoItens: $orcamentoItens)';
   }
 
   @override
@@ -432,22 +811,15 @@ class _$CreateOrcamentoRequestImpl implements _CreateOrcamentoRequest {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$CreateOrcamentoRequestImpl &&
-            (identical(other.clienteId, clienteId) ||
-                other.clienteId == clienteId) &&
-            (identical(other.placa, placa) || other.placa == placa) &&
-            (identical(other.modelo, modelo) || other.modelo == modelo) &&
-            const DeepCollectionEquality().equals(other._itens, _itens));
+            (identical(other.orcamento, orcamento) ||
+                other.orcamento == orcamento) &&
+            (identical(other.orcamentoItens, orcamentoItens) ||
+                other.orcamentoItens == orcamentoItens));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    clienteId,
-    placa,
-    modelo,
-    const DeepCollectionEquality().hash(_itens),
-  );
+  int get hashCode => Object.hash(runtimeType, orcamento, orcamentoItens);
 
   /// Create a copy of CreateOrcamentoRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -469,26 +841,20 @@ class _$CreateOrcamentoRequestImpl implements _CreateOrcamentoRequest {
 
 abstract class _CreateOrcamentoRequest implements CreateOrcamentoRequest {
   const factory _CreateOrcamentoRequest({
-    @JsonKey(name: 'clienteId') required final int clienteId,
-    required final String placa,
-    required final String modelo,
+    @JsonKey(name: 'Orcamento') required final OrcamentoData orcamento,
     @JsonKey(name: 'orcamentoItens')
-    required final List<CreateOrcamentoItemRequest> itens,
+    required final OrcamentoItensWrapper orcamentoItens,
   }) = _$CreateOrcamentoRequestImpl;
 
   factory _CreateOrcamentoRequest.fromJson(Map<String, dynamic> json) =
       _$CreateOrcamentoRequestImpl.fromJson;
 
   @override
-  @JsonKey(name: 'clienteId')
-  int get clienteId;
-  @override
-  String get placa;
-  @override
-  String get modelo;
+  @JsonKey(name: 'Orcamento')
+  OrcamentoData get orcamento;
   @override
   @JsonKey(name: 'orcamentoItens')
-  List<CreateOrcamentoItemRequest> get itens;
+  OrcamentoItensWrapper get orcamentoItens;
 
   /// Create a copy of CreateOrcamentoRequest
   /// with the given fields replaced by the non-null parameter values.

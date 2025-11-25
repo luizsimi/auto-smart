@@ -22,24 +22,46 @@ Map<String, dynamic> _$$CreateOrcamentoItemRequestImplToJson(
   'orcamentoValor': instance.valor,
 };
 
-_$CreateOrcamentoRequestImpl _$$CreateOrcamentoRequestImplFromJson(
+_$OrcamentoDataImpl _$$OrcamentoDataImplFromJson(Map<String, dynamic> json) =>
+    _$OrcamentoDataImpl(
+      clienteId: (json['clienteId'] as num).toInt(),
+      placa: json['placa'] as String,
+      modelo: json['modelo'] as String,
+    );
+
+Map<String, dynamic> _$$OrcamentoDataImplToJson(_$OrcamentoDataImpl instance) =>
+    <String, dynamic>{
+      'clienteId': instance.clienteId,
+      'placa': instance.placa,
+      'modelo': instance.modelo,
+    };
+
+_$OrcamentoItensWrapperImpl _$$OrcamentoItensWrapperImplFromJson(
   Map<String, dynamic> json,
-) => _$CreateOrcamentoRequestImpl(
-  clienteId: (json['clienteId'] as num).toInt(),
-  placa: json['placa'] as String,
-  modelo: json['modelo'] as String,
-  itens: (json['orcamentoItens'] as List<dynamic>)
+) => _$OrcamentoItensWrapperImpl(
+  orcamentoItens: (json['orcamentoItens'] as List<dynamic>)
       .map(
         (e) => CreateOrcamentoItemRequest.fromJson(e as Map<String, dynamic>),
       )
       .toList(),
 );
 
+Map<String, dynamic> _$$OrcamentoItensWrapperImplToJson(
+  _$OrcamentoItensWrapperImpl instance,
+) => <String, dynamic>{'orcamentoItens': instance.orcamentoItens};
+
+_$CreateOrcamentoRequestImpl _$$CreateOrcamentoRequestImplFromJson(
+  Map<String, dynamic> json,
+) => _$CreateOrcamentoRequestImpl(
+  orcamento: OrcamentoData.fromJson(json['Orcamento'] as Map<String, dynamic>),
+  orcamentoItens: OrcamentoItensWrapper.fromJson(
+    json['orcamentoItens'] as Map<String, dynamic>,
+  ),
+);
+
 Map<String, dynamic> _$$CreateOrcamentoRequestImplToJson(
   _$CreateOrcamentoRequestImpl instance,
 ) => <String, dynamic>{
-  'clienteId': instance.clienteId,
-  'placa': instance.placa,
-  'modelo': instance.modelo,
-  'orcamentoItens': instance.itens,
+  'Orcamento': instance.orcamento,
+  'orcamentoItens': instance.orcamentoItens,
 };

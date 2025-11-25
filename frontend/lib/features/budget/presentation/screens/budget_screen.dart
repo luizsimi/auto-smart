@@ -433,10 +433,14 @@ class _BudgetScreenState extends State<BudgetScreen> {
     }
 
     final request = CreateOrcamentoRequest(
-      clienteId: clienteId,
-      placa: placa,
-      modelo: modelo,
-      itens: itens,
+      orcamento: OrcamentoData(
+        clienteId: clienteId,
+        placa: placa,
+        modelo: modelo,
+      ),
+      orcamentoItens: OrcamentoItensWrapper(
+        orcamentoItens: itens,
+      ),
     );
 
     setState(() {
