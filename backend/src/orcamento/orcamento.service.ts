@@ -49,7 +49,7 @@ export class OrcamentoService {
         skip,
         take: limit,
         orderBy: { id: 'desc' },
-        include: { orcamentoItems: true },
+        include: { orcamentoItems: true, cliente: true },
       }),
       this.prisma.orcamento.count(),
     ]);
