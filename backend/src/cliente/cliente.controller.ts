@@ -51,13 +51,16 @@ export class ClienteController {
     return result.data as Cliente;
   }
 
+  // Busca um cliente por CPF antes do orçamento !!
   @Get(':cpf')
+
   @ApiOperation({ summary: 'Busca um cliente pelo CPF' })
   @ApiResponse({ status: 200, description: 'Cliente encontrado' })
   @ApiResponse({ status: 404, description: 'Cliente não encontrado' })
   @ApiParam({ name: 'cpf', example: '12345678900' })
   async findOne(@Param('cpf') cpf: string): Promise<Cliente> {
     const sanitizedCpf = cpf.replace(/\D/g, '');
+
 
     if (!validateCPF(sanitizedCpf)) {
       throw new BadRequestException('CPF inválido');
