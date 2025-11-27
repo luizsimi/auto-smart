@@ -839,16 +839,77 @@ class _BudgetScreenState extends State<BudgetScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                RoundedTextField(
-                                  label: 'Total de Serviços',
-                                  controller: _totalServicesController,
-                                  enabled: false,
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: RoundedTextField(
+                                        label: 'Total de Serviços',
+                                        controller: _totalServicesController,
+                                        enabled: false,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      height: 56,
+                                      child: const Text(
+                                        '+',
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: RoundedTextField(
+                                        label: 'Total de Peças',
+                                        controller: _totalPartsController,
+                                        enabled: false,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 12),
-                                RoundedTextField(
-                                  label: 'Total do Orçamento',
+                                TextField(
                                   controller: _grandTotalController,
                                   enabled: false,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: 'Total do Orçamento',
+                                    labelStyle: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                    floatingLabelStyle: const TextStyle(
+                                      color: AppColors.primary,
+                                      fontSize: 14,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                    ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.green[50],
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 16,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

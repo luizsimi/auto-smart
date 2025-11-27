@@ -265,11 +265,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const BudgetScreen()),
           );
+          
+          if (mounted) {
+            _loadOrcamentos();
+          }
         },
         backgroundColor: AppColors.primary,
         child: const Icon(
