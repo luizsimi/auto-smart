@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/theme/colors.dart';
 import '../../data/user_service.dart';
@@ -20,6 +21,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController _confirmarSenhaController = TextEditingController();
 
   final UserService _userService = UserService();
+
+  final MaskTextInputFormatter _telefoneFormatter = MaskTextInputFormatter(
+    mask: '(##) #####-####',
+    filter: {'#': RegExp(r'\d')},
+  );
 
   bool _isLoading = false;
   bool _isLoadingData = true;
@@ -52,12 +58,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       final userData = await _userService.getCurrentUser();
       if (userData != null && mounted) {
+        // Aplicar máscara no telefone se tiver valor
+        final phoneNumber = userData['phoneNumber'] ?? '';
+        if (phoneNumber.isNotEmpty) {
+          final maskedPhone = _telefoneFormatter.maskText(phoneNumber.replaceAll(RegExp(r'\D'), ''));
+          _telefoneController.text = maskedPhone;
+        }
+        
         setState(() {
           _userId = userData['id'];
           _nomeController.text = userData['firstName'] ?? '';
           _sobrenomeController.text = userData['lastName'] ?? '';
           _emailController.text = userData['email'] ?? '';
-          _telefoneController.text = userData['phoneNumber'] ?? '';
           _cpf = userData['cpf'];
           _storeId = userData['storeId'];
           _isLoadingData = false;
@@ -99,7 +111,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         firstName: _nomeController.text.trim(),
         lastName: _sobrenomeController.text.trim(),
         email: _emailController.text.trim(),
-        phoneNumber: _telefoneController.text.trim(),
+        phoneNumber: _telefoneFormatter.getUnmaskedText(),
         cpf: _cpf!,
         storeId: _storeId!,
         password: _novaSenhaController.text.isNotEmpty
@@ -164,15 +176,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         title: 'EDITAR DADOS PESSOAIS',
         showBackButton: true,
       ),
-      body: _isLoadingData
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            )
-          : Form(
-              key: _formKey,
-              child: ListView(
-                padding: const EdgeInsets.all(20),
-                children: [
+      body: Column(
+        children: [
+          // Header padronizado
+          Container(
+            width: double.infinity,
+            height: 50,
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+            ),
+            child: Center(
+              child: Text(
+                'PERFIL',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ),
+          // Conteúdo
+          Expanded(
+            child: _isLoadingData
+                ? const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  )
+                : Form(
+                    key: _formKey,
+                    child: ListView(
+                      padding: const EdgeInsets.all(20),
+                      children: [
                   // Info do usuário
                   Container(
                     padding: const EdgeInsets.all(16),
@@ -285,18 +324,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                   const SizedBox(height: 16),
 
-                  _buildTextField(
-                    controller: _telefoneController,
-                    label: 'Telefone',
-                    icon: Icons.phone_outlined,
-                    keyboardType: TextInputType.phone,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, digite seu telefone';
-                      }
-                      return null;
-                    },
-                  ),
+                  _buildPhoneField(),
 
                   const SizedBox(height: 32),
 
@@ -394,9 +422,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
 
                   const SizedBox(height: 20),
-                ],
-              ),
-            ),
+                      ],
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -509,6 +540,58 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             onPressed: onToggleVisibility,
           ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
+          errorStyle: const TextStyle(
+            color: Colors.red,
+            fontSize: 12,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhoneField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.08),
+            spreadRadius: 0,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: _telefoneController,
+        keyboardType: TextInputType.phone,
+        enabled: !_isLoading,
+        inputFormatters: [_telefoneFormatter],
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Por favor, digite seu telefone';
+          }
+          final unmasked = _telefoneFormatter.getUnmaskedText();
+          if (unmasked.length < 10) {
+            return 'Telefone deve ter pelo menos 10 dígitos';
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          labelText: 'Telefone',
+          hintText: '(00) 00000-0000',
+          prefixIcon: Icon(Icons.phone_outlined, color: Colors.grey[600]),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
