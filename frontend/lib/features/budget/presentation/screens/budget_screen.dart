@@ -3,12 +3,14 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/rounded_text_field.dart';
+import '../../../../core/widgets/cpf_modal.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../orcamentos/model/cliente.dart';
 import '../../../orcamentos/model/cliente_api.dart';
 import '../../../orcamentos/model/create_orcamento_request.dart';
 import '../../../orcamentos/model/repository/orcamento_repository_impl.dart';
 import '../widgets/part_item_card.dart';
+import '../../../services/presentation/screens/home_screen.dart';
 
 class BudgetScreen extends StatefulWidget {
   const BudgetScreen({
@@ -28,7 +30,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
   final TextEditingController _vehicleModelController = TextEditingController();
   final TextEditingController _plateController = TextEditingController();
   final TextEditingController _cpfDisplayController = TextEditingController();
-  final TextEditingController _cpfInputController = TextEditingController();
   final TextEditingController _totalPartsController = TextEditingController();
   final TextEditingController _totalServicesController = TextEditingController();
   final TextEditingController _grandTotalController = TextEditingController();
@@ -45,10 +46,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
     mask: '###.###.###-##',
     filter: {'#': RegExp(r'[0-9]')},
   );
-  final MaskTextInputFormatter _cpfInputMask = MaskTextInputFormatter(
-    mask: '###.###.###-##',
-    filter: {'#': RegExp(r'[0-9]')},
-  );
   
   final List<Map<String, TextEditingController>> _partsList = [];
   final List<Map<String, TextEditingController>> _serviceList = [];
@@ -59,7 +56,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
     if (widget.initialCpf != null) {
       _clienteCpf = widget.initialCpf!.replaceAll(RegExp(r'[^0-9]'), '');
       _cpfDisplayController.text = _cpfMask.maskText(_clienteCpf!);
-      _cpfInputController.text = _cpfMask.maskText(_clienteCpf!);
     }
 
     if (_partsList.isEmpty) {
@@ -84,7 +80,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
     _vehicleModelController.dispose();
     _plateController.dispose();
     _cpfDisplayController.dispose();
-    _cpfInputController.dispose();
     _totalPartsController.dispose();
     _totalServicesController.dispose();
     _grandTotalController.dispose();
@@ -185,82 +180,32 @@ class _BudgetScreenState extends State<BudgetScreen> {
         'R\$ ${total.toStringAsFixed(2).replaceAll('.', ',')}';
   }
 
-  Future<void> _showCpfModal({bool initialCall = false}) async {
-    if (_clienteCpf != null && _cpfInputController.text.isEmpty) {
-      _cpfInputController.text = _cpfMask.maskText(_clienteCpf!);
-    }
+  void _navigateToHome() {
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => const HomeScreen(),
+      ),
+    );
+  }
 
-    final formKey = GlobalKey<FormState>();
-    final result = await showDialog<String>(
-      context: context,
+  Future<void> _showCpfModal({bool initialCall = false}) async {
+    final result = await CpfModal.show(
+      context,
+      initialCpf: _clienteCpf,
       barrierDismissible: !initialCall,
-      builder: (dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
-            'CPF do cliente',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          content: Form(
-            key: formKey,
-            child: TextFormField(
-              controller: _cpfInputController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [_cpfInputMask],
-              decoration: const InputDecoration(
-                labelText: 'CPF',
-                hintText: '000.000.000-00',
-              ),
-              validator: (value) {
-                final digits = value?.replaceAll(RegExp(r'[^0-9]'), '') ?? '';
-                if (digits.isEmpty) {
-                  return 'Informe o CPF';
-                }
-                if (digits.length != 11) {
-                  return 'CPF deve conter 11 dígitos';
-                }
-                return null;
-              },
-            ),
-          ),
-          actions: [
-            if (!initialCall)
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text('Cancelar'),
-              ),
-            ElevatedButton(
-              onPressed: () {
-                if (formKey.currentState?.validate() ?? false) {
-                  Navigator.of(dialogContext)
-                      .pop(_cpfInputMask.getUnmaskedText());
-                }
-              },
-              child: const Text('Continuar'),
-            ),
-          ],
-        );
-      },
     );
 
     if (!mounted) return;
 
-    if (result == null) {
-      if (initialCall && _clienteCpf == null) {
-        Navigator.of(context).maybePop();
-      }
+    if (result == null || result == 'CANCELLED') {
+      _navigateToHome();
       return;
     }
 
     setState(() {
       _clienteCpf = result;
       _cpfDisplayController.text = _cpfMask.maskText(result);
-      _cpfInputController.text = _cpfMask.maskText(result);
     });
 
     await _fetchCliente(result);

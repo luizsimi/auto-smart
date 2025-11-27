@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../checkin/presentation/screens/checkin_screen.dart';
 import '../../../orcamentos/model/orcamento_item_model.dart';
@@ -154,22 +155,12 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   }
 
   Future<void> _showEditConfirmationDialog() async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Editar Orçamento'),
-        content: const Text('Deseja alterar o status desse orçamento?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Não'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Sim'),
-          ),
-        ],
-      ),
+    final result = await ConfirmationDialog.show(
+      context,
+      title: 'Editar Orçamento',
+      message: 'Deseja alterar o status desse orçamento?',
+      confirmText: 'Sim',
+      cancelText: 'Não',
     );
 
     if (result == true) {
@@ -196,22 +187,12 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   }
 
   Future<void> _deleteOrcamento() async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Excluir Orçamento'),
-        content: const Text('Tem certeza que deseja excluir o orçamento?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Não'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Sim', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+    final result = await ConfirmationDialog.show(
+      context,
+      title: 'Excluir Orçamento',
+      message: 'Tem certeza que deseja excluir o orçamento?',
+      confirmText: 'Sim',
+      cancelText: 'Não',
     );
 
     if (result != true) return;
