@@ -67,6 +67,9 @@ dependencies:
   
   # Validação de formulários (CPF, email, etc)
   validatorless: ^1.0.0
+  
+  # Gráficos
+  fl_chart: ^0.69.0
 
 dev_dependencies:
   flutter_test:
