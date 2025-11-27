@@ -14,10 +14,11 @@ datasource db {
 }
 
 model Store {
-  id        Int     @id @default(autoincrement())
-  name      String
-  imagePath String?
-  users     User[]
+  id         Int         @id @default(autoincrement())
+  name       String
+  imagePath  String?
+  users      User[]
+  checklists Checklist[]
 }
 
 model User {
@@ -31,41 +32,38 @@ model User {
   storeId      Int
   levelAcesso  LevelAcesso @default(USER)
   refreshToken String?
-  store        Store       @relation(fields: [storeId], references: [id])
+
+  store Store @relation(fields: [storeId], references: [id])
+
+  checklists Checklist[]
+}
+
+enum LevelAcesso {
+  ADMIN
+  USER
 }
 
 model Cliente {
-  id         Int         @id @default(autoincrement())
-  nome       String
-  cpf        String      @unique
-  telefone   String
+  id       Int    @id @default(autoincrement())
+  nome     String
+  cpf      String @unique
+  telefone String
+
   orcamentos Orcamento[]
 }
 
 model Orcamento {
-  id             Int             @id @default(autoincrement())
-  clienteId      Int
-  placa          String
-  modelo         String
-  status         Status          @default(AGUARDANDO)
-  dataCriacao    DateTime        @default(now())
-  cliente        Cliente         @relation(fields: [clienteId], references: [id])
+  id          Int      @id @default(autoincrement())
+  clienteId   Int
+  placa       String
+  modelo      String
+  status      Status   @default(AGUARDANDO)
+  dataCriacao DateTime @default(now())
+
+  cliente Cliente @relation(fields: [clienteId], references: [id])
+
   orcamentoItems OrcamentoItem[]
-}
-
-model OrcamentoItem {
-  id             Int           @id @default(autoincrement())
-  descricao      String
-  tipoOrcamento  TipoOrcamento
-  orcamentoValor Float
-  orcamentoId    Int
-  ativo          Boolean       @default(true)
-  orcamento      Orcamento     @relation(fields: [orcamentoId], references: [id])
-}
-
-enum TipoOrcamento {
-  SERVICO
-  PECA
+  checklists     Checklist[]
 }
 
 enum Status {
@@ -76,7 +74,49 @@ enum Status {
   CANCELADO
 }
 
-enum LevelAcesso {
-  ADMIN
-  USER
+model OrcamentoItem {
+  id             Int           @id @default(autoincrement())
+  descricao      String
+  tipoOrcamento  TipoOrcamento
+  orcamentoValor Float
+  orcamentoId    Int
+  ativo          Boolean       @default(true)
+
+  orcamento Orcamento @relation(fields: [orcamentoId], references: [id])
+}
+
+enum TipoOrcamento {
+  SERVICO
+  PECA
+}
+
+enum CheckListType {
+  CHECK_IN
+  CHECK_OUT
+}
+
+model Checklist {
+  id          Int           @id @default(autoincrement())
+  dataCriacao DateTime      @default(now())
+  observacoes String
+  tipo        CheckListType
+
+  orcamentoId Int
+  storeId     Int
+  userId      Int
+
+  orcamento Orcamento @relation(fields: [orcamentoId], references: [id])
+  store     Store     @relation(fields: [storeId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  checklistItems ChekListPhotos[]
+}
+
+model ChekListPhotos {
+  id          Int      @id @default(autoincrement())
+  dataCriacao DateTime @default(now())
+  descricao   String
+  checklistId Int
+
+  checklist Checklist @relation(fields: [checklistId], references: [id])
 }
