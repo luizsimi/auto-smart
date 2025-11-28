@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { Status, type Orcamento, type OrcamentoItem } from '@prisma/client';
 
@@ -6,13 +6,27 @@ import { Status, type Orcamento, type OrcamentoItem } from '@prisma/client';
 export class OrcamentoService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: {
-    orcamento: Omit<Orcamento, 'id' | 'dataCriacao' | 'status'>;
-    orcamentoItens: Omit<OrcamentoItem, 'id' | 'orcamentoId' | 'ativo'>[];
-  }): Promise<Orcamento & { orcamentoItems: OrcamentoItem[] }> {
+  async create(
+    data: {
+      orcamento: Omit<
+        Orcamento,
+        'id' | 'dataCriacao' | 'status' | 'storeId' | 'criadoPor'
+      >;
+      orcamentoItens: Omit<OrcamentoItem, 'id' | 'orcamentoId' | 'ativo'>[];
+    },
+    cpf: string,
+  ): Promise<Orcamento & { orcamentoItems: OrcamentoItem[] }> {
+    const user = await this.prisma.user.findUnique({
+      where: { cpf: cpf },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User não encontrado');
+    }
+
     const created = await this.prisma.$transaction(async (tx) => {
       const orcamento = await tx.orcamento.create({
-        data: data.orcamento,
+        data: { ...data.orcamento, storeId: user.storeId, criadoPor: user.id },
       });
 
       if (data.orcamentoItens?.length) {
@@ -28,7 +42,11 @@ export class OrcamentoService {
 
     return this.prisma.orcamento.findUniqueOrThrow({
       where: { id: created.id },
-      include: { orcamentoItems: true },
+      include: {
+        orcamentoItems: true,
+        cliente: true,
+        store: true,
+      },
     });
   }
 
@@ -83,7 +101,15 @@ export class OrcamentoService {
       throw new Error('Orçamento não encontrado');
     }
 
-    console.log(status);
+    if (
+      orcamento.status === Status.FINALIZADO ||
+      orcamento.status === Status.REPROVADO
+    ) {
+      throw new BadRequestException(
+        'Não é possível alterar o status de um orçamento finalizado ou cancelado',
+      );
+    }
+
     return this.prisma.orcamento.update({
       where: { id },
       data: { status },
@@ -118,9 +144,6 @@ export class OrcamentoService {
       );
     }
 
-    //remover
-    console.log({ itens, orcamentosItems });
-
     try {
       const updated = await Promise.all(
         itens.map((item) =>
@@ -139,6 +162,22 @@ export class OrcamentoService {
       return updated;
     } catch (error: unknown) {
       throw new Error(error as string);
+    }
+  }
+
+  async findByVeiculoPlaca(placa: string): Promise<Orcamento[]> {
+    try {
+      return this.prisma.orcamento.findMany({
+        where: {
+          placa: {
+            contains: placa,
+            mode: 'insensitive',
+          },
+        },
+        include: { orcamentoItems: true, cliente: true },
+      });
+    } catch (error: unknown) {
+      throw new BadRequestException(error);
     }
   }
 }

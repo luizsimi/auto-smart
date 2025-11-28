@@ -14,10 +14,12 @@ datasource db {
 }
 
 model Store {
-  id         Int         @id @default(autoincrement())
-  name       String
-  imagePath  String?
-  users      User[]
+  id        Int     @id @default(autoincrement())
+  name      String
+  imagePath String?
+  users     User[]
+
+  orcamentos Orcamento[]
   checklists Checklist[]
 }
 
@@ -32,15 +34,10 @@ model User {
   storeId      Int
   levelAcesso  LevelAcesso @default(USER)
   refreshToken String?
+  store        Store       @relation(fields: [storeId], references: [id])
 
-  store Store @relation(fields: [storeId], references: [id])
-
+  orcamentos Orcamento[]
   checklists Checklist[]
-}
-
-enum LevelAcesso {
-  ADMIN
-  USER
 }
 
 model Cliente {
@@ -54,13 +51,18 @@ model Cliente {
 
 model Orcamento {
   id          Int      @id @default(autoincrement())
-  clienteId   Int
   placa       String
   modelo      String
   status      Status   @default(AGUARDANDO)
   dataCriacao DateTime @default(now())
 
-  cliente Cliente @relation(fields: [clienteId], references: [id])
+  clienteId Int
+  storeId   Int
+  criadoPor Int
+
+  criadoPorUser User    @relation(fields: [criadoPor], references: [id])
+  store         Store   @relation(fields: [storeId], references: [id])
+  cliente       Cliente @relation(fields: [clienteId], references: [id])
 
   orcamentoItems OrcamentoItem[]
   checklists     Checklist[]
@@ -88,6 +90,11 @@ model OrcamentoItem {
 enum TipoOrcamento {
   SERVICO
   PECA
+}
+
+enum LevelAcesso {
+  ADMIN
+  USER
 }
 
 enum CheckListType {

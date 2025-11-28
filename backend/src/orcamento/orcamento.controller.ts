@@ -10,6 +10,8 @@ import {
   Patch,
   Delete,
   NotFoundException,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { OrcamentoService } from './orcamento.service';
 import { Status, Orcamento, OrcamentoItem } from '@prisma/client';
@@ -24,6 +26,7 @@ import {
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import type { Request } from 'express';
 
 @ApiBearerAuth()
 @ApiTags('Orçamentos')
@@ -44,13 +47,21 @@ export class OrcamentoController {
   @ApiResponse({ status: 400, description: 'Erro de validação' })
   async create(
     @Body() body: CreateOrcamentoDto,
+    @Req() req: Request,
   ): Promise<Orcamento & { orcamentoItems: OrcamentoItem[] }> {
     const { Orcamento, orcamentoItens } = body;
 
-    return this.orcamentoService.create({
-      orcamento: Orcamento,
-      orcamentoItens: orcamentoItens.orcamentoItens,
-    });
+    const { cpf } = req.user as { cpf: string };
+
+    if (!cpf) throw new UnauthorizedException('Usuário não autenticado');
+
+    return this.orcamentoService.create(
+      {
+        orcamento: Orcamento,
+        orcamentoItens: orcamentoItens.orcamentoItens,
+      },
+      cpf,
+    );
   }
 
   @Get(':id')
@@ -84,6 +95,12 @@ export class OrcamentoController {
     limit: number;
   }> {
     return this.orcamentoService.findAll(Number(page), Number(limit));
+  }
+
+  @Get(':placa/veiculo')
+  async findByVeiculoPlaca(@Param('placa') placa: string) {
+    const orcamentos = await this.orcamentoService.findByVeiculoPlaca(placa);
+    return orcamentos;
   }
 
   @Patch(':id/status')
