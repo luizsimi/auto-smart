@@ -50,7 +50,7 @@ model Orcamento {
   id          Int      @id @default(autoincrement())
   placa       String
   modelo      String
-  status      Status   @default(PENDENTE)
+  status      Status   @default(AGUARDANDO)
   dataCriacao DateTime @default(now())
 
   clienteId Int
@@ -80,7 +80,7 @@ enum TipoOrcamento {
 }
 
 enum Status {
-  PENDENTE
+  AGUARDANDO
   EM_MANUTENCAO
   SERVICO_EXTERNO
   REPROVADO
