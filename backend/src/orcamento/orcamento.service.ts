@@ -45,7 +45,6 @@ export class OrcamentoService {
       include: {
         orcamentoItems: true,
         cliente: true,
-        criadoPorUser: true,
         store: true,
       },
     });
