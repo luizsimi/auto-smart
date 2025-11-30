@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/authenticated_image_widget.dart';
+import '../../../../core/widgets/photo_view_screen.dart';
 import '../../../../core/theme/colors.dart';
 import '../../model/checklist_model.dart';
+import '../../../orcamentos/model/repository/orcamento_repository_impl.dart';
 
-class ViewChecklistScreen extends StatelessWidget {
+class ViewChecklistScreen extends StatefulWidget {
   final ChecklistModel checklist;
   final String vehicleTitle;
   final String clientName;
@@ -15,6 +17,39 @@ class ViewChecklistScreen extends StatelessWidget {
     required this.vehicleTitle,
     required this.clientName,
   });
+
+  @override
+  State<ViewChecklistScreen> createState() => _ViewChecklistScreenState();
+}
+
+class _ViewChecklistScreenState extends State<ViewChecklistScreen> {
+  final OrcamentoRepositoryImpl _orcamentoRepository = OrcamentoRepositoryImpl();
+  String? _fotoVeiculo;
+  bool _isLoadingFoto = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFotoVeiculo();
+  }
+
+  Future<void> _loadFotoVeiculo() async {
+    try {
+      final orcamento = await _orcamentoRepository.findOne(widget.checklist.orcamentoId);
+      if (mounted) {
+        setState(() {
+          _fotoVeiculo = orcamento.fotoVeiculo;
+          _isLoadingFoto = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingFoto = false;
+        });
+      }
+    }
+  }
 
   String _formatDate(DateTime? date) {
     if (date == null) return 'Data não disponível';
@@ -46,9 +81,9 @@ class ViewChecklistScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCheckin = checklist.tipo.toUpperCase() == 'CHECK_IN';
-    final km = _extractKm(checklist.observacoes);
-    final observacoes = _extractObservacoes(checklist.observacoes);
+    final isCheckin = widget.checklist.tipo.toUpperCase() == 'CHECK_IN';
+    final km = _extractKm(widget.checklist.observacoes);
+    final observacoes = _extractObservacoes(widget.checklist.observacoes);
 
     return Scaffold(
       backgroundColor: AppColors.secondary,
@@ -78,16 +113,46 @@ class ViewChecklistScreen extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    width: 50,
-                    height: 50,
+                    width: 75,
+                    height: 75,
                     decoration: BoxDecoration(
-                      color: (isCheckin ? Colors.green : Colors.blue).withOpacity(0.1),
+                      color: AppColors.secondary,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
-                      Icons.directions_car,
-                      color: isCheckin ? Colors.green : Colors.blue,
-                      size: 28,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: _isLoadingFoto
+                          ? Container(
+                              color: AppColors.secondary,
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                                ),
+                              ),
+                            )
+                          : _fotoVeiculo != null && _fotoVeiculo!.isNotEmpty
+                              ? AuthenticatedImageWidget(
+                                  path: _fotoVeiculo!,
+                                  fit: BoxFit.cover,
+                                  isOrcamento: true,
+                                  errorWidget: Container(
+                                    color: AppColors.secondary,
+                                    child: Icon(
+                                      Icons.directions_car,
+                                      color: isCheckin ? Colors.green : Colors.blue,
+                                      size: 40,
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  color: AppColors.secondary,
+                                  child: Icon(
+                                    Icons.directions_car,
+                                    color: isCheckin ? Colors.green : Colors.blue,
+                                    size: 40,
+                                  ),
+                                ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -96,7 +161,7 @@ class ViewChecklistScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          vehicleTitle,
+                          widget.vehicleTitle,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -105,7 +170,7 @@ class ViewChecklistScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          clientName,
+                          widget.clientName,
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary,
@@ -218,7 +283,7 @@ class ViewChecklistScreen extends StatelessWidget {
               ),
             ],
 
-            if (checklist.checklistItems.isNotEmpty) ...[
+            if (widget.checklist.checklistItems.isNotEmpty) ...[
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(20),
@@ -264,12 +329,29 @@ class ViewChecklistScreen extends StatelessWidget {
                         crossAxisSpacing: 8,
                         mainAxisSpacing: 8,
                       ),
-                      itemCount: checklist.checklistItems.length,
+                      itemCount: widget.checklist.checklistItems.length,
                       itemBuilder: (context, index) {
-                        final photo = checklist.checklistItems[index];
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: _buildImage(photo.path),
+                        final photo = widget.checklist.checklistItems[index];
+                        return GestureDetector(
+                          onTap: () {
+                            final photoPaths = widget.checklist.checklistItems
+                                .map((item) => item.path)
+                                .toList();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PhotoViewScreen(
+                                  photoPaths: photoPaths,
+                                  initialIndex: index,
+                                  isOrcamento: false,
+                                ),
+                              ),
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: _buildImage(photo.path),
+                          ),
                         );
                       },
                     ),
@@ -294,7 +376,7 @@ class ViewChecklistScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Data e hora: ${_formatDate(checklist.dataCriacao)}',
+                    'Data e hora: ${_formatDate(widget.checklist.dataCriacao)}',
                     style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.textSecondary,

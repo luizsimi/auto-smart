@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/authenticated_image_widget.dart';
+import '../../../../core/widgets/image_source_dialog.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../checkin/presentation/screens/checkin_screen.dart';
 import '../../../checkin/presentation/screens/checkout_screen.dart';
@@ -333,46 +334,9 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   }
 
   Future<void> _showImageSourceDialog() async {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Row(
-            children: [
-              const Icon(Icons.add_a_photo, color: AppColors.primary),
-              const SizedBox(width: 12),
-              const Text(
-                'Adicionar Foto',
-                style: TextStyle(fontSize: 18),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt, color: AppColors.primary),
-                title: const Text('Câmera'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickFoto(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library, color: AppColors.primary),
-                title: const Text('Galeria'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickFoto(ImageSource.gallery);
-                },
-              ),
-            ],
-          ),
-        );
-      },
+    return ImageSourceDialog.show(
+      context,
+      onSourceSelected: _pickFoto,
     );
   }
 

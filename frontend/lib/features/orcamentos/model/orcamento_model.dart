@@ -15,6 +15,7 @@ class OrcamentoModel with _$OrcamentoModel {
     required String modelo,
     @Default('') String status,
     @JsonKey(name: 'dataCriacao') DateTime? dataCriacao,
+    @JsonKey(name: 'fotoVeiculo') String? fotoVeiculo,
     @JsonKey(name: 'orcamentoItems')
     @Default(<OrcamentoItemModel>[])
     List<OrcamentoItemModel> orcamentoItems,

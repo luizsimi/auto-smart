@@ -4,8 +4,12 @@ import 'package:flutter/foundation.dart' show kIsWeb, Uint8List;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../core/widgets/photo_view_screen.dart';
+import '../../../../core/widgets/image_source_dialog.dart';
+import '../../../../core/widgets/authenticated_image_widget.dart';
 import '../../../../core/theme/colors.dart';
 import '../../model/repository/checklist_repository_impl.dart';
+import '../../../orcamentos/model/repository/orcamento_repository_impl.dart';
 
 class CheckinScreen extends StatefulWidget {
   final int orcamentoId;
@@ -30,7 +34,34 @@ class _CheckinScreenState extends State<CheckinScreen> {
   final List<XFile> _images = [];
   final Map<int, Uint8List> _imageBytes = {};
   final ChecklistRepositoryImpl _repository = ChecklistRepositoryImpl();
+  final OrcamentoRepositoryImpl _orcamentoRepository = OrcamentoRepositoryImpl();
   bool _isSaving = false;
+  String? _fotoVeiculo;
+  bool _isLoadingFoto = true;
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadFotoVeiculo();
+  }
+
+  Future<void> _loadFotoVeiculo() async {
+    try {
+      final orcamento = await _orcamentoRepository.findOne(widget.orcamentoId);
+      if (mounted) {
+        setState(() {
+          _fotoVeiculo = orcamento.fotoVeiculo;
+          _isLoadingFoto = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingFoto = false;
+        });
+      }
+    }
+  }
   
   @override
   void dispose() {
@@ -40,46 +71,9 @@ class _CheckinScreenState extends State<CheckinScreen> {
   }
 
   Future<void> _showImageSourceDialog() async {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Row(
-            children: [
-              const Icon(Icons.add_a_photo, color: AppColors.primary),
-              const SizedBox(width: 12),
-              const Text(
-                'Adicionar Foto',
-                style: TextStyle(fontSize: 18),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt, color: AppColors.primary),
-                title: const Text('Câmera'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library, color: AppColors.primary),
-                title: const Text('Galeria'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.gallery);
-                },
-              ),
-            ],
-          ),
-        );
-      },
+    return ImageSourceDialog.show(
+      context,
+      onSourceSelected: _pickImage,
     );
   }
 
@@ -285,16 +279,46 @@ class _CheckinScreenState extends State<CheckinScreen> {
               child: Row(
                 children: [
                   Container(
-                    width: 50,
-                    height: 50,
+                    width: 75,
+                    height: 75,
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: AppColors.secondary,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
-                      Icons.directions_car,
-                      color: Colors.green,
-                      size: 28,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: _isLoadingFoto
+                          ? Container(
+                              color: AppColors.secondary,
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                                ),
+                              ),
+                            )
+                          : _fotoVeiculo != null && _fotoVeiculo!.isNotEmpty
+                              ? AuthenticatedImageWidget(
+                                  path: _fotoVeiculo!,
+                                  fit: BoxFit.cover,
+                                  isOrcamento: true,
+                                  errorWidget: Container(
+                                    color: AppColors.secondary,
+                                    child: const Icon(
+                                      Icons.directions_car,
+                                      color: Colors.green,
+                                      size: 40,
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  color: AppColors.secondary,
+                                  child: const Icon(
+                                    Icons.directions_car,
+                                    color: Colors.green,
+                                    size: 40,
+                                  ),
+                                ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -486,9 +510,22 @@ class _CheckinScreenState extends State<CheckinScreen> {
                       itemBuilder: (context, index) {
                         return Stack(
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: _buildImagePreview(_images[index], index),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PhotoViewScreen(
+                                      localImages: _images,
+                                      initialIndex: index,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: _buildImagePreview(_images[index], index),
+                              ),
                             ),
                             Positioned(
                               top: 4,
