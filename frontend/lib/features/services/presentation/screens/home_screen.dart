@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1: // EXECUTANDO
         return status.toUpperCase() == 'EXECUTANDO';
       case 2: // FINALIZADOS
-        return status.toUpperCase() == 'FINALIZADO';
+        return status.toUpperCase() == 'FINALIZADO' || status.toUpperCase() == 'REPROVADO';
       default:
         return false;
     }

@@ -106,7 +106,7 @@ export class OrcamentoService {
       orcamento.status === Status.REPROVADO
     ) {
       throw new BadRequestException(
-        'Não é possível alterar o status de um orçamento finalizado ou cancelado',
+        'Não é possível alterar o status de um orçamento finalizado ou reprovado',
       );
     }
 

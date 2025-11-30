@@ -154,6 +154,11 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     return _statusColorMap[key] ?? Colors.grey;
   }
 
+  bool _canEditOrcamento() {
+    final statusKey = _getStatusKey(_currentStatus);
+    return statusKey != 'FINALIZADO' && statusKey != 'REPROVADO';
+  }
+
   Future<void> _showEditConfirmationDialog() async {
     final result = await ConfirmationDialog.show(
       context,
@@ -400,12 +405,19 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                               ),
                                               isDense: true,
                                               isExpanded: false,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              dropdownColor: statusColor,
+                                              selectedItemBuilder: (BuildContext context) {
+                                                return _statusMap.values.map((String status) {
+                                                  return Text(
+                                                    status,
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  );
+                                                }).toList();
+                                              },
+                                              dropdownColor: AppColors.white,
                                               items: _statusMap.values
                                                   .map((status) =>
                                                       DropdownMenuItem(
@@ -415,7 +427,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                                           child: Text(
                                                             status,
                                                             style: const TextStyle(
-                                                              color: Colors.white,
+                                                              color: AppColors.textPrimary,
                                                               fontSize: 12,
                                                             ),
                                                           ),
@@ -543,7 +555,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      if (!_isEditing)
+                      if (!_isEditing && _canEditOrcamento())
                         IconButton(
                           icon: const Icon(Icons.edit, size: 20),
                           onPressed: _showEditConfirmationDialog,
