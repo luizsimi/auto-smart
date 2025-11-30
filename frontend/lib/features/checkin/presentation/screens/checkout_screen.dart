@@ -7,12 +7,12 @@ import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/theme/colors.dart';
 import '../../model/repository/checklist_repository_impl.dart';
 
-class CheckinScreen extends StatefulWidget {
+class CheckoutScreen extends StatefulWidget {
   final int orcamentoId;
   final String vehicleTitle;
   final String clientName;
   
-  const CheckinScreen({
+  const CheckoutScreen({
     super.key,
     required this.orcamentoId,
     required this.vehicleTitle,
@@ -20,10 +20,10 @@ class CheckinScreen extends StatefulWidget {
   });
 
   @override
-  State<CheckinScreen> createState() => _CheckinScreenState();
+  State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
-class _CheckinScreenState extends State<CheckinScreen> {
+class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController _kmController = TextEditingController();
   final TextEditingController _observacoesController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
@@ -118,12 +118,14 @@ class _CheckinScreenState extends State<CheckinScreen> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao capturar imagem: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao capturar imagem: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -179,7 +181,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
     );
   }
 
-  Future<void> _salvarCheckin() async {
+  Future<void> _salvarCheckout() async {
     if (_isSaving) return;
 
     if (_kmController.text.trim().isEmpty) {
@@ -216,7 +218,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
 
       await _repository.createChecklist(
         widget.orcamentoId,
-        'CHECK_IN',
+        'CHECK_OUT',
         observacoes,
         _images,
       );
@@ -228,7 +230,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
               children: [
                 Icon(Icons.check_circle, color: Colors.white),
                 SizedBox(width: 12),
-                Text('Check-in realizado com sucesso!'),
+                Text('Check-out realizado com sucesso!'),
               ],
             ),
             backgroundColor: Colors.green,
@@ -241,7 +243,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao realizar check-in: ${e.toString().replaceFirst('Exception: ', '')}'),
+            content: Text('Erro ao realizar check-out: ${e.toString().replaceFirst('Exception: ', '')}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -260,7 +262,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
     return Scaffold(
       backgroundColor: AppColors.secondary,
       appBar: const CustomAppBar(
-        title: 'CHECK-IN',
+        title: 'CHECK-OUT',
         showBackButton: true,
       ),
       body: SingleChildScrollView(
@@ -288,12 +290,12 @@ class _CheckinScreenState extends State<CheckinScreen> {
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: Colors.blue.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.directions_car,
-                      color: Colors.green,
+                      color: Colors.blue,
                       size: 28,
                     ),
                   ),
@@ -519,46 +521,46 @@ class _CheckinScreenState extends State<CheckinScreen> {
                   if (_images.length < 10)
                     InkWell(
                       onTap: _showImageSourceDialog,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.primary,
-                          width: 2,
-                          style: BorderStyle.solid,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.add_photo_alternate,
-                            size: 48,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          border: Border.all(
                             color: AppColors.primary,
+                            width: 2,
+                            style: BorderStyle.solid,
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Adicionar Foto',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.add_photo_alternate,
+                              size: 48,
                               color: AppColors.primary,
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Câmera ou Galeria',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Adicionar Foto',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Câmera ou Galeria',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -568,7 +570,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _isSaving ? null : _salvarCheckin,
+                onPressed: _isSaving ? null : _salvarCheckout,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -587,7 +589,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
                         ),
                       )
                     : const Text(
-                        'Salvar Check-in',
+                        'Salvar Check-out',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,

@@ -1,8 +1,17 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
+import '../../../../core/widgets/authenticated_image_widget.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../checkin/presentation/screens/checkin_screen.dart';
+import '../../../checkin/presentation/screens/checkout_screen.dart';
+import '../../../checkin/presentation/screens/view_checklist_screen.dart';
+import '../../../checkin/model/checklist_model.dart';
+import '../../../checkin/model/repository/checklist_repository_impl.dart';
 import '../../../orcamentos/model/orcamento_item_model.dart';
 import '../../../orcamentos/model/repository/orcamento_repository_impl.dart';
 
@@ -42,6 +51,13 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   List<OrcamentoItemModel> _editedPecas = [];
   List<OrcamentoItemModel> _editedServicos = [];
   final OrcamentoRepositoryImpl _repository = OrcamentoRepositoryImpl();
+  final ChecklistRepositoryImpl _checklistRepository = ChecklistRepositoryImpl();
+  final ImagePicker _picker = ImagePicker();
+  List<ChecklistModel> _checklists = [];
+  bool _isLoadingChecklists = false;
+  String? _fotoVeiculo;
+  XFile? _selectedFoto;
+  Uint8List? _selectedFotoBytes;
 
   final Map<String, String> _statusMap = {
     'AGUARDANDO': 'AGUARDANDO',
@@ -69,6 +85,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     _editedPecas = List.from(widget.pecas);
     _editedServicos = List.from(widget.servicos);
     _loadOrcamentoData();
+    _loadChecklists();
   }
 
   Future<void> _loadOrcamentoData() async {
@@ -82,6 +99,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
         setState(() {
           final statusMap = _mapStatusToDisplay(orcamento.status);
           _currentStatus = statusMap['text'] as String;
+          _fotoVeiculo = orcamento.fotoVeiculo;
           
           final allItems = orcamento.orcamentoItems;
           _currentPecas = allItems
@@ -101,6 +119,76 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     } catch (e) {
       // Silently fail, keep using widget data
     }
+  }
+
+  Future<void> _loadChecklists() async {
+    final orcamentoId = int.tryParse(widget.id);
+    if (orcamentoId == null) return;
+
+    setState(() {
+      _isLoadingChecklists = true;
+    });
+
+    try {
+      final checklists = await _checklistRepository.findByOrcamentoId(orcamentoId);
+      if (mounted) {
+        setState(() {
+          _checklists = checklists;
+          _isLoadingChecklists = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingChecklists = false;
+        });
+      }
+      // Silently fail
+    }
+  }
+
+  ChecklistModel? _getChecklistByTipo(String tipo) {
+    try {
+      return _checklists.firstWhere(
+        (checklist) => checklist.tipo.toUpperCase() == tipo.toUpperCase(),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Data não disponível';
+    final localDate = date.toLocal();
+    final day = localDate.day.toString().padLeft(2, '0');
+    final month = localDate.month.toString().padLeft(2, '0');
+    final year = localDate.year;
+    final hour = localDate.hour.toString().padLeft(2, '0');
+    final minute = localDate.minute.toString().padLeft(2, '0');
+    return '$day/$month/$year às $hour:$minute';
+  }
+
+  Duration? _calculateTotalTime() {
+    final checkin = _getChecklistByTipo('CHECK_IN');
+    final checkout = _getChecklistByTipo('CHECK_OUT');
+    
+    if (checkin?.dataCriacao == null || checkout?.dataCriacao == null) {
+      return null;
+    }
+
+    final checkinLocal = checkin!.dataCriacao!.toLocal();
+    final checkoutLocal = checkout!.dataCriacao!.toLocal();
+    return checkoutLocal.difference(checkinLocal);
+  }
+
+  String _formatDuration(Duration duration) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    
+    if (hours > 0) {
+      return '${hours}h ${minutes}min';
+    }
+    return '${minutes}min';
   }
 
   Map<String, dynamic> _mapStatusToDisplay(String status) {
@@ -244,6 +332,82 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     }
   }
 
+  Future<void> _showImageSourceDialog() async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              const Icon(Icons.add_a_photo, color: AppColors.primary),
+              const SizedBox(width: 12),
+              const Text(
+                'Adicionar Foto',
+                style: TextStyle(fontSize: 18),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: AppColors.primary),
+                title: const Text('Câmera'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickFoto(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: AppColors.primary),
+                title: const Text('Galeria'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickFoto(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickFoto(ImageSource source) async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        Uint8List? bytes;
+        if (kIsWeb) {
+          bytes = await image.readAsBytes();
+        }
+        
+        setState(() {
+          _selectedFoto = image;
+          _selectedFotoBytes = bytes;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao selecionar imagem: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _saveChanges() async {
     if (_isSaving) return;
 
@@ -271,11 +435,17 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
         await _repository.updateStatus(orcamentoId, statusKey);
       }
 
+      if (_selectedFoto != null) {
+        await _repository.updateFotoVeiculo(orcamentoId, _selectedFoto!);
+      }
+
       await _loadOrcamentoData();
 
       if (mounted) {
         setState(() {
           _isEditing = false;
+          _selectedFoto = null;
+          _selectedFotoBytes = null;
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -352,17 +522,110 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            width: 75,
-                            height: 75,
-                            decoration: BoxDecoration(
-                              color: AppColors.secondary,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.directions_car,
-                              color: AppColors.textSecondary,
-                              size: 40,
+                          GestureDetector(
+                            onTap: _isEditing ? _showImageSourceDialog : null,
+                            child: Container(
+                              width: 75,
+                              height: 75,
+                              decoration: BoxDecoration(
+                                color: AppColors.secondary,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: _selectedFoto != null
+                                    ? (kIsWeb && _selectedFotoBytes != null
+                                        ? Image.memory(
+                                            _selectedFotoBytes!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return Container(
+                                                color: AppColors.secondary,
+                                                child: const Icon(
+                                                  Icons.directions_car,
+                                                  color: AppColors.textSecondary,
+                                                  size: 40,
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        : Image.file(
+                                            File(_selectedFoto!.path),
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return Container(
+                                                color: AppColors.secondary,
+                                                child: const Icon(
+                                                  Icons.directions_car,
+                                                  color: AppColors.textSecondary,
+                                                  size: 40,
+                                                ),
+                                              );
+                                            },
+                                          ))
+                                    : _fotoVeiculo != null && _fotoVeiculo!.isNotEmpty
+                                        ? Stack(
+                                            fit: StackFit.expand,
+                                            children: [
+                                              AuthenticatedImageWidget(
+                                                path: _fotoVeiculo!,
+                                                fit: BoxFit.cover,
+                                                isOrcamento: true,
+                                                errorWidget: Container(
+                                                  color: AppColors.secondary,
+                                                  child: const Icon(
+                                                    Icons.directions_car,
+                                                    color: AppColors.textSecondary,
+                                                    size: 40,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (_isEditing)
+                                                Container(
+                                                  color: Colors.black.withOpacity(0.3),
+                                                  child: const Center(
+                                                    child: Text(
+                                                      'Adicionar foto',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 10,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                      textAlign: TextAlign.center,
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          )
+                                        : Stack(
+                                            fit: StackFit.expand,
+                                            children: [
+                                              Container(
+                                                color: AppColors.secondary,
+                                                child: const Icon(
+                                                  Icons.directions_car,
+                                                  color: AppColors.textSecondary,
+                                                  size: 40,
+                                                ),
+                                              ),
+                                              if (_isEditing)
+                                                Container(
+                                                  color: Colors.black.withOpacity(0.3),
+                                                  child: const Center(
+                                                    child: Text(
+                                                      'Adicionar foto',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 10,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                      textAlign: TextAlign.center,
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -823,69 +1086,126 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                   ),
                   const SizedBox(height: 16),
                   
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CheckinScreen(
-                            vehicleTitle: widget.title,
-                            clientName: widget.clientName,
+                  Builder(
+                    builder: (context) {
+                      final checkin = _getChecklistByTipo('CHECK_IN');
+                      final hasCheckin = checkin != null;
+                      final orcamentoId = int.tryParse(widget.id);
+
+                      return InkWell(
+                        onTap: hasCheckin || orcamentoId == null
+                            ? null
+                            : () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CheckinScreen(
+                                      orcamentoId: orcamentoId,
+                                      vehicleTitle: widget.title,
+                                      clientName: widget.clientName,
+                                    ),
+                                  ),
+                                );
+                                if (result == true) {
+                                  _loadChecklists();
+                                  _loadOrcamentoData();
+                                }
+                              },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Opacity(
+                          opacity: hasCheckin ? 0.6 : 1.0,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    hasCheckin ? Icons.check_circle : Icons.login,
+                                    color: Colors.green,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Check-in',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.textSecondary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              hasCheckin
+                                                  ? _formatDate(checkin?.dataCriacao)
+                                                  : 'Clique para fazer check-in',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: hasCheckin
+                                                    ? AppColors.textPrimary
+                                                    : AppColors.textSecondary,
+                                              ),
+                                            ),
+                                          ),
+                                          if (hasCheckin)
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => ViewChecklistScreen(
+                                                      checklist: checkin!,
+                                                      vehicleTitle: widget.title,
+                                                      clientName: widget.clientName,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              style: TextButton.styleFrom(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                minimumSize: Size.zero,
+                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                              ),
+                                              child: const Text(
+                                                'Ver',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: AppColors.primary,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (!hasCheckin)
+                                  const Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 16,
+                                    color: AppColors.textSecondary,
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       );
                     },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.login,
-                              color: Colors.green,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Check-in',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.textSecondary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '15/12/2024 às 08:30',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16,
-                            color: AppColors.textSecondary,
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                   
                   const SizedBox(height: 16),
@@ -897,89 +1217,178 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                   
                   const SizedBox(height: 16),
                   
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.logout,
-                          color: Colors.blue,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Check-out',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
+                  Builder(
+                    builder: (context) {
+                      final checkin = _getChecklistByTipo('CHECK_IN');
+                      final checkout = _getChecklistByTipo('CHECK_OUT');
+                      final hasCheckin = checkin != null;
+                      final hasCheckout = checkout != null;
+                      final orcamentoId = int.tryParse(widget.id);
+                      final canDoCheckout = hasCheckin && !hasCheckout && orcamentoId != null;
+
+                      return InkWell(
+                        onTap: !canDoCheckout
+                            ? null
+                            : () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CheckoutScreen(
+                                      orcamentoId: orcamentoId,
+                                      vehicleTitle: widget.title,
+                                      clientName: widget.clientName,
+                                    ),
+                                  ),
+                                );
+                                if (result == true) {
+                                  _loadChecklists();
+                                  _loadOrcamentoData();
+                                }
+                              },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Opacity(
+                          opacity: hasCheckout ? 0.6 : 1.0,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    hasCheckout ? Icons.check_circle : Icons.logout,
+                                    color: Colors.blue,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Check-out',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.textSecondary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              hasCheckout
+                                                  ? _formatDate(checkout?.dataCriacao)
+                                                  : !hasCheckin
+                                                      ? 'Aguardando check-in'
+                                                      : 'Clique para fazer check-out',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: hasCheckout || !hasCheckin
+                                                    ? AppColors.textPrimary
+                                                    : AppColors.textSecondary,
+                                              ),
+                                            ),
+                                          ),
+                                          if (hasCheckout)
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => ViewChecklistScreen(
+                                                      checklist: checkout!,
+                                                      vehicleTitle: widget.title,
+                                                      clientName: widget.clientName,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              style: TextButton.styleFrom(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                minimumSize: Size.zero,
+                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                              ),
+                                              child: const Text(
+                                                'Ver',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: AppColors.primary,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (canDoCheckout)
+                                  const Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 16,
+                                    color: AppColors.textSecondary,
+                                  ),
+                              ],
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              displayStatus == 'FINALIZADO' 
-                                ? '15/12/2024 às 17:45' 
-                                : 'Aguardando finalização',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: displayStatus == 'FINALIZADO' 
-                                  ? AppColors.textPrimary 
-                                  : AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                   
-                  if (displayStatus == 'FINALIZADO') ...[
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.secondary,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                  Builder(
+                    builder: (context) {
+                      final totalTime = _calculateTotalTime();
+                      if (totalTime == null) return const SizedBox.shrink();
+
+                      return Column(
                         children: [
-                          const Icon(
-                            Icons.access_time,
-                            size: 18,
-                            color: AppColors.textSecondary,
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Tempo total: ',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.secondary,
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          ),
-                          Text(
-                            '9h 15min',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.access_time,
+                                  size: 18,
+                                  color: AppColors.textSecondary,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Tempo total: ',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                                Text(
+                                  _formatDuration(totalTime),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                  ],
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

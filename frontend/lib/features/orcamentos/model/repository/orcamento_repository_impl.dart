@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../create_orcamento_request.dart';
@@ -45,14 +46,19 @@ class OrcamentoRepositoryImpl implements OrcamentoRepository {
     return Uri.parse('$_baseUrl$path').replace(queryParameters: params);
   }
 
-  Future<Map<String, String>> _buildHeaders() async {
+  Future<Map<String, String>> _buildHeaders({bool includeContentType = true}) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(_tokenKey);
 
     return <String, String>{
-      'Content-Type': 'application/json',
+      if (includeContentType) 'Content-Type': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     };
+  }
+
+  Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
   }
 
   @override
@@ -221,5 +227,49 @@ class OrcamentoRepositoryImpl implements OrcamentoRepository {
         'Erro ao excluir orçamento: ${response.statusCode} ${response.body}',
       );
     }
+  }
+
+  @override
+  Future<OrcamentoModel> updateFotoVeiculo(int id, XFile foto) async {
+    final uri = _buildUri('/orcamentos/$id/foto');
+    final token = await _getToken();
+
+    if (token == null || token.isEmpty) {
+      throw Exception('Usuário não autenticado');
+    }
+
+    final request = http.MultipartRequest('PATCH', uri);
+
+    request.headers['Authorization'] = 'Bearer $token';
+
+    final bytes = await foto.readAsBytes();
+    final multipartFile = http.MultipartFile.fromBytes(
+      'foto',
+      bytes,
+      filename: foto.name.isNotEmpty ? foto.name : 'foto.jpg',
+    );
+    request.files.add(multipartFile);
+
+    final streamedResponse = await _client.send(request);
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode != 200) {
+      final errorBody = jsonDecode(response.body);
+      final errorMessage = errorBody is Map<String, dynamic>
+          ? (errorBody['message'] ?? errorBody['error'] ?? response.body)
+          : response.body;
+      throw Exception('Erro ao atualizar foto: ${response.statusCode} - $errorMessage');
+    }
+
+    final dynamic decoded = jsonDecode(response.body);
+    if (decoded is Map<String, dynamic>) {
+      return OrcamentoModel.fromJson(decoded);
+    }
+
+    throw Exception('Formato inesperado da resposta ao atualizar foto');
+  }
+
+  String getOrcamentoPhotoUrl(String nomeFoto) {
+    return '$_baseUrl/orcamentos/$nomeFoto/foto';
   }
 }

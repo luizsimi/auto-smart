@@ -99,4 +99,18 @@ export class ChecklistService {
       },
     });
   }
+
+  async findByOrcamentoId(orcamentoId: number) {
+    return this.prisma.checklist.findMany({
+      where: {
+        orcamentoId,
+      },
+      include: {
+        checklistItems: true,
+      },
+      orderBy: {
+        dataCriacao: 'asc',
+      },
+    });
+  }
 }

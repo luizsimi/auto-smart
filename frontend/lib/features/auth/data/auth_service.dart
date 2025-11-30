@@ -11,7 +11,7 @@ class AuthService {
   static const String userDataKey = 'user_data';
 
   static const String _envApiBaseUrl =
-      String.fromEnvironment('http://127.0.0.1:3000', defaultValue: '');
+      String.fromEnvironment('API_BASE_URL', defaultValue: '');
 
   static String get _baseApiUrl {
     if (_envApiBaseUrl.isNotEmpty) {

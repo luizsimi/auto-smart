@@ -29,6 +29,8 @@ mixin _$OrcamentoModel {
   String get status => throw _privateConstructorUsedError;
   @JsonKey(name: 'dataCriacao')
   DateTime? get dataCriacao => throw _privateConstructorUsedError;
+  @JsonKey(name: 'fotoVeiculo')
+  String? get fotoVeiculo => throw _privateConstructorUsedError;
   @JsonKey(name: 'orcamentoItems')
   List<OrcamentoItemModel> get orcamentoItems =>
       throw _privateConstructorUsedError;
@@ -58,6 +60,7 @@ abstract class $OrcamentoModelCopyWith<$Res> {
     String modelo,
     String status,
     @JsonKey(name: 'dataCriacao') DateTime? dataCriacao,
+    @JsonKey(name: 'fotoVeiculo') String? fotoVeiculo,
     @JsonKey(name: 'orcamentoItems') List<OrcamentoItemModel> orcamentoItems,
     ClienteModel? cliente,
   });
@@ -86,6 +89,7 @@ class _$OrcamentoModelCopyWithImpl<$Res, $Val extends OrcamentoModel>
     Object? modelo = null,
     Object? status = null,
     Object? dataCriacao = freezed,
+    Object? fotoVeiculo = freezed,
     Object? orcamentoItems = null,
     Object? cliente = freezed,
   }) {
@@ -93,36 +97,31 @@ class _$OrcamentoModelCopyWithImpl<$Res, $Val extends OrcamentoModel>
       _value.copyWith(
             id: freezed == id
                 ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as int?,
+                : id                       as int?,
             clienteId: null == clienteId
                 ? _value.clienteId
-                : clienteId // ignore: cast_nullable_to_non_nullable
-                      as int,
+                : clienteId                       as int,
             placa: null == placa
                 ? _value.placa
-                : placa // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : placa                       as String,
             modelo: null == modelo
                 ? _value.modelo
-                : modelo // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : modelo                       as String,
             status: null == status
                 ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : status                       as String,
             dataCriacao: freezed == dataCriacao
                 ? _value.dataCriacao
-                : dataCriacao // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
+                : dataCriacao                       as DateTime?,
+            fotoVeiculo: freezed == fotoVeiculo
+                ? _value.fotoVeiculo
+                : fotoVeiculo                       as String?,
             orcamentoItems: null == orcamentoItems
                 ? _value.orcamentoItems
-                : orcamentoItems // ignore: cast_nullable_to_non_nullable
-                      as List<OrcamentoItemModel>,
+                : orcamentoItems                       as List<OrcamentoItemModel>,
             cliente: freezed == cliente
                 ? _value.cliente
-                : cliente // ignore: cast_nullable_to_non_nullable
-                      as ClienteModel?,
+                : cliente                       as ClienteModel?,
           )
           as $Val,
     );
@@ -159,6 +158,7 @@ abstract class _$$OrcamentoModelImplCopyWith<$Res>
     String modelo,
     String status,
     @JsonKey(name: 'dataCriacao') DateTime? dataCriacao,
+    @JsonKey(name: 'fotoVeiculo') String? fotoVeiculo,
     @JsonKey(name: 'orcamentoItems') List<OrcamentoItemModel> orcamentoItems,
     ClienteModel? cliente,
   });
@@ -187,6 +187,7 @@ class __$$OrcamentoModelImplCopyWithImpl<$Res>
     Object? modelo = null,
     Object? status = null,
     Object? dataCriacao = freezed,
+    Object? fotoVeiculo = freezed,
     Object? orcamentoItems = null,
     Object? cliente = freezed,
   }) {
@@ -194,36 +195,31 @@ class __$$OrcamentoModelImplCopyWithImpl<$Res>
       _$OrcamentoModelImpl(
         id: freezed == id
             ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as int?,
+            : id                   as int?,
         clienteId: null == clienteId
             ? _value.clienteId
-            : clienteId // ignore: cast_nullable_to_non_nullable
-                  as int,
+            : clienteId                   as int,
         placa: null == placa
             ? _value.placa
-            : placa // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : placa                   as String,
         modelo: null == modelo
             ? _value.modelo
-            : modelo // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : modelo                   as String,
         status: null == status
             ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : status                   as String,
         dataCriacao: freezed == dataCriacao
             ? _value.dataCriacao
-            : dataCriacao // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
+            : dataCriacao                   as DateTime?,
+        fotoVeiculo: freezed == fotoVeiculo
+            ? _value.fotoVeiculo
+            : fotoVeiculo                   as String?,
         orcamentoItems: null == orcamentoItems
             ? _value._orcamentoItems
-            : orcamentoItems // ignore: cast_nullable_to_non_nullable
-                  as List<OrcamentoItemModel>,
+            : orcamentoItems                   as List<OrcamentoItemModel>,
         cliente: freezed == cliente
             ? _value.cliente
-            : cliente // ignore: cast_nullable_to_non_nullable
-                  as ClienteModel?,
+            : cliente                   as ClienteModel?,
       ),
     );
   }
@@ -239,6 +235,7 @@ class _$OrcamentoModelImpl implements _OrcamentoModel {
     required this.modelo,
     this.status = '',
     @JsonKey(name: 'dataCriacao') this.dataCriacao,
+    @JsonKey(name: 'fotoVeiculo') this.fotoVeiculo,
     @JsonKey(name: 'orcamentoItems')
     final List<OrcamentoItemModel> orcamentoItems =
         const <OrcamentoItemModel>[],
@@ -263,6 +260,9 @@ class _$OrcamentoModelImpl implements _OrcamentoModel {
   @override
   @JsonKey(name: 'dataCriacao')
   final DateTime? dataCriacao;
+  @override
+  @JsonKey(name: 'fotoVeiculo')
+  final String? fotoVeiculo;
   final List<OrcamentoItemModel> _orcamentoItems;
   @override
   @JsonKey(name: 'orcamentoItems')
@@ -277,7 +277,7 @@ class _$OrcamentoModelImpl implements _OrcamentoModel {
 
   @override
   String toString() {
-    return 'OrcamentoModel(id: $id, clienteId: $clienteId, placa: $placa, modelo: $modelo, status: $status, dataCriacao: $dataCriacao, orcamentoItems: $orcamentoItems, cliente: $cliente)';
+    return 'OrcamentoModel(id: $id, clienteId: $clienteId, placa: $placa, modelo: $modelo, status: $status, dataCriacao: $dataCriacao, fotoVeiculo: $fotoVeiculo, orcamentoItems: $orcamentoItems, cliente: $cliente)';
   }
 
   @override
@@ -293,6 +293,8 @@ class _$OrcamentoModelImpl implements _OrcamentoModel {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.dataCriacao, dataCriacao) ||
                 other.dataCriacao == dataCriacao) &&
+            (identical(other.fotoVeiculo, fotoVeiculo) ||
+                other.fotoVeiculo == fotoVeiculo) &&
             const DeepCollectionEquality().equals(
               other._orcamentoItems,
               _orcamentoItems,
@@ -310,6 +312,7 @@ class _$OrcamentoModelImpl implements _OrcamentoModel {
     modelo,
     status,
     dataCriacao,
+    fotoVeiculo,
     const DeepCollectionEquality().hash(_orcamentoItems),
     cliente,
   );
@@ -339,6 +342,7 @@ abstract class _OrcamentoModel implements OrcamentoModel {
     required final String modelo,
     final String status,
     @JsonKey(name: 'dataCriacao') final DateTime? dataCriacao,
+    @JsonKey(name: 'fotoVeiculo') final String? fotoVeiculo,
     @JsonKey(name: 'orcamentoItems')
     final List<OrcamentoItemModel> orcamentoItems,
     final ClienteModel? cliente,
@@ -361,6 +365,9 @@ abstract class _OrcamentoModel implements OrcamentoModel {
   @override
   @JsonKey(name: 'dataCriacao')
   DateTime? get dataCriacao;
+  @override
+  @JsonKey(name: 'fotoVeiculo')
+  String? get fotoVeiculo;
   @override
   @JsonKey(name: 'orcamentoItems')
   List<OrcamentoItemModel> get orcamentoItems;

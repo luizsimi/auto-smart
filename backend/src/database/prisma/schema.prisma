@@ -53,6 +53,7 @@ model Orcamento {
   status      Status      @default(AGUARDANDO)
   storeId     Int
   criadoPor   Int
+  fotoVeiculo String?
   checklists  Checklist[]
 
   cliente        Cliente         @relation(fields: [clienteId], references: [id])

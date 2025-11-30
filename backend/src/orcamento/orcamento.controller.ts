@@ -12,6 +12,9 @@ import {
   NotFoundException,
   Req,
   UnauthorizedException,
+  UseInterceptors,
+  UploadedFile,
+  Res,
 } from '@nestjs/common';
 import { OrcamentoService } from './orcamento.service';
 import { Status, Orcamento, OrcamentoItem } from '@prisma/client';
@@ -26,7 +29,11 @@ import {
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'src/upload/multer.config';
+import { join } from 'path';
+import { promises as fs } from 'fs';
 
 @ApiBearerAuth()
 @ApiTags('Orçamentos')
@@ -62,6 +69,23 @@ export class OrcamentoController {
       },
       cpf,
     );
+  }
+
+  @Get(':nome/foto')
+  @ApiOperation({
+    summary: 'Retorna a foto do veículo do orçamento',
+  })
+  @ApiParam({ name: 'nome', type: String, description: 'Nome do arquivo da foto' })
+  @ApiResponse({ status: 200, description: 'Foto retornada com sucesso' })
+  @ApiResponse({ status: 404, description: 'Foto não encontrada' })
+  async getFoto(@Param('nome') nome: string, @Res() res: Response) {
+    const filePath = join(__dirname, '../../uploads/fotos', nome);
+    try {
+      await fs.access(filePath);
+      res.sendFile(filePath);
+    } catch (err: unknown) {
+      res.status(404).json({ message: 'Arquivo não encontrado', error: err });
+    }
   }
 
   @Get(':id')
@@ -101,6 +125,35 @@ export class OrcamentoController {
   async findByVeiculoPlaca(@Param('placa') placa: string) {
     const orcamentos = await this.orcamentoService.findByVeiculoPlaca(placa);
     return orcamentos;
+  }
+
+  @Patch(':id/foto')
+  @UseInterceptors(FileInterceptor('foto', multerConfig))
+  @ApiOperation({
+    summary: 'Atualiza a foto do veículo do orçamento',
+  })
+  @ApiParam({ name: 'id', type: Number, example: 1 })
+  @ApiResponse({ status: 200, description: 'Foto atualizada com sucesso' })
+  @ApiResponse({ status: 400, description: 'Erro ao atualizar foto' })
+  @ApiResponse({ status: 404, description: 'Orçamento não encontrado' })
+  async updateFoto(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<Orcamento> {
+    if (!file) {
+      throw new BadRequestException('Arquivo de foto é obrigatório');
+    }
+
+    try {
+      return await this.orcamentoService.updateFotoVeiculo(
+        Number(id),
+        file.filename,
+      );
+    } catch (error: unknown) {
+      throw new BadRequestException(
+        (error as Error).message || 'Erro ao atualizar foto',
+      );
+    }
   }
 
   @Patch(':id/status')
@@ -168,4 +221,5 @@ export class OrcamentoController {
       );
     }
   }
+
 }

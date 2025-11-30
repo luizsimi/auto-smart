@@ -83,16 +83,13 @@ class _$CreateOrcamentoItemRequestCopyWithImpl<
       _value.copyWith(
             descricao: null == descricao
                 ? _value.descricao
-                : descricao // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : descricao                       as String,
             tipoOrcamento: null == tipoOrcamento
                 ? _value.tipoOrcamento
-                : tipoOrcamento // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : tipoOrcamento                       as String,
             valor: null == valor
                 ? _value.valor
-                : valor // ignore: cast_nullable_to_non_nullable
-                      as double,
+                : valor                       as double,
           )
           as $Val,
     );
@@ -141,16 +138,13 @@ class __$$CreateOrcamentoItemRequestImplCopyWithImpl<$Res>
       _$CreateOrcamentoItemRequestImpl(
         descricao: null == descricao
             ? _value.descricao
-            : descricao // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : descricao                   as String,
         tipoOrcamento: null == tipoOrcamento
             ? _value.tipoOrcamento
-            : tipoOrcamento // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : tipoOrcamento                   as String,
         valor: null == valor
             ? _value.valor
-            : valor // ignore: cast_nullable_to_non_nullable
-                  as double,
+            : valor                   as double,
       ),
     );
   }
@@ -302,16 +296,13 @@ class _$OrcamentoDataCopyWithImpl<$Res, $Val extends OrcamentoData>
       _value.copyWith(
             clienteId: null == clienteId
                 ? _value.clienteId
-                : clienteId // ignore: cast_nullable_to_non_nullable
-                      as int,
+                : clienteId                       as int,
             placa: null == placa
                 ? _value.placa
-                : placa // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : placa                       as String,
             modelo: null == modelo
                 ? _value.modelo
-                : modelo // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : modelo                       as String,
           )
           as $Val,
     );
@@ -356,16 +347,13 @@ class __$$OrcamentoDataImplCopyWithImpl<$Res>
       _$OrcamentoDataImpl(
         clienteId: null == clienteId
             ? _value.clienteId
-            : clienteId // ignore: cast_nullable_to_non_nullable
-                  as int,
+            : clienteId                   as int,
         placa: null == placa
             ? _value.placa
-            : placa // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : placa                   as String,
         modelo: null == modelo
             ? _value.modelo
-            : modelo // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : modelo                   as String,
       ),
     );
   }
@@ -508,8 +496,7 @@ class _$OrcamentoItensWrapperCopyWithImpl<
       _value.copyWith(
             orcamentoItens: null == orcamentoItens
                 ? _value.orcamentoItens
-                : orcamentoItens // ignore: cast_nullable_to_non_nullable
-                      as List<CreateOrcamentoItemRequest>,
+                : orcamentoItens                       as List<CreateOrcamentoItemRequest>,
           )
           as $Val,
     );
@@ -550,8 +537,7 @@ class __$$OrcamentoItensWrapperImplCopyWithImpl<$Res>
       _$OrcamentoItensWrapperImpl(
         orcamentoItens: null == orcamentoItens
             ? _value._orcamentoItens
-            : orcamentoItens // ignore: cast_nullable_to_non_nullable
-                  as List<CreateOrcamentoItemRequest>,
+            : orcamentoItens                   as List<CreateOrcamentoItemRequest>,
       ),
     );
   }
@@ -701,12 +687,10 @@ class _$CreateOrcamentoRequestCopyWithImpl<
       _value.copyWith(
             orcamento: null == orcamento
                 ? _value.orcamento
-                : orcamento // ignore: cast_nullable_to_non_nullable
-                      as OrcamentoData,
+                : orcamento                       as OrcamentoData,
             orcamentoItens: null == orcamentoItens
                 ? _value.orcamentoItens
-                : orcamentoItens // ignore: cast_nullable_to_non_nullable
-                      as OrcamentoItensWrapper,
+                : orcamentoItens                       as OrcamentoItensWrapper,
           )
           as $Val,
     );
@@ -772,12 +756,10 @@ class __$$CreateOrcamentoRequestImplCopyWithImpl<$Res>
       _$CreateOrcamentoRequestImpl(
         orcamento: null == orcamento
             ? _value.orcamento
-            : orcamento // ignore: cast_nullable_to_non_nullable
-                  as OrcamentoData,
+            : orcamento                   as OrcamentoData,
         orcamentoItens: null == orcamentoItens
             ? _value.orcamentoItens
-            : orcamentoItens // ignore: cast_nullable_to_non_nullable
-                  as OrcamentoItensWrapper,
+            : orcamentoItens                   as OrcamentoItensWrapper,
       ),
     );
   }

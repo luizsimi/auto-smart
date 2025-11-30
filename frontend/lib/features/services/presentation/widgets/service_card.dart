@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/widgets/authenticated_image_widget.dart';
 
 class ServiceCard extends StatelessWidget {
   final String id;
@@ -8,6 +9,7 @@ class ServiceCard extends StatelessWidget {
   final String status;
   final Color statusColor;
   final VoidCallback? onTap;
+  final String? vehiclePhotoPath;
 
   const ServiceCard({
     super.key,
@@ -18,6 +20,7 @@ class ServiceCard extends StatelessWidget {
     required this.status,
     required this.statusColor,
     this.onTap,
+    this.vehiclePhotoPath,
   });
 
   @override
@@ -51,14 +54,36 @@ class ServiceCard extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  color: Colors.grey[400],
-                  child: const Icon(
-                    Icons.directions_car,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                ),
+                child: vehiclePhotoPath != null && vehiclePhotoPath!.isNotEmpty
+                    ? AuthenticatedImageWidget(
+                        path: vehiclePhotoPath!,
+                        fit: BoxFit.cover,
+                        isOrcamento: true,
+                        placeholder: Container(
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        ),
+                        errorWidget: Container(
+                          color: Colors.grey[400],
+                          child: const Icon(
+                            Icons.directions_car,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        color: Colors.grey[400],
+                        child: const Icon(
+                          Icons.directions_car,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                      ),
               ),
             ),
             const SizedBox(width: 16),

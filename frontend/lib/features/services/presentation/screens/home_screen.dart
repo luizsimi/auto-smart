@@ -90,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final orcamentos = await _repository.findAll(page: 1, limit: 100);
+      
       setState(() {
         _orcamentos = orcamentos;
         _isLoading = false;
@@ -226,6 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   phone: orcamento.cliente?.telefone ?? 'N/A',
                                   status: statusMap['text'] as String,
                                   statusColor: statusMap['color'] as Color,
+                                  vehiclePhotoPath: orcamento.fotoVeiculo,
                                   onTap: () async {
                                     final result = await Navigator.push(
                                       context,

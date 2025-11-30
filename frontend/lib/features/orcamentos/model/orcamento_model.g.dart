@@ -16,6 +16,7 @@ _$OrcamentoModelImpl _$$OrcamentoModelImplFromJson(Map<String, dynamic> json) =>
       dataCriacao: json['dataCriacao'] == null
           ? null
           : DateTime.parse(json['dataCriacao'] as String),
+      fotoVeiculo: json['fotoVeiculo'] as String?,
       orcamentoItems:
           (json['orcamentoItems'] as List<dynamic>?)
               ?.map(
@@ -37,6 +38,7 @@ Map<String, dynamic> _$$OrcamentoModelImplToJson(
   'modelo': instance.modelo,
   'status': instance.status,
   'dataCriacao': instance.dataCriacao?.toIso8601String(),
+  'fotoVeiculo': instance.fotoVeiculo,
   'orcamentoItems': instance.orcamentoItems,
   'cliente': instance.cliente,
 };

@@ -84,28 +84,22 @@ class _$OrcamentoItemModelCopyWithImpl<$Res, $Val extends OrcamentoItemModel>
       _value.copyWith(
             id: freezed == id
                 ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as int?,
+                : id                       as int?,
             orcamentoId: freezed == orcamentoId
                 ? _value.orcamentoId
-                : orcamentoId // ignore: cast_nullable_to_non_nullable
-                      as int?,
+                : orcamentoId                       as int?,
             descricao: null == descricao
                 ? _value.descricao
-                : descricao // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : descricao                       as String,
             tipoOrcamento: null == tipoOrcamento
                 ? _value.tipoOrcamento
-                : tipoOrcamento // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : tipoOrcamento                       as String,
             valor: null == valor
                 ? _value.valor
-                : valor // ignore: cast_nullable_to_non_nullable
-                      as double,
+                : valor                       as double,
             ativo: null == ativo
                 ? _value.ativo
-                : ativo // ignore: cast_nullable_to_non_nullable
-                      as bool,
+                : ativo                       as bool,
           )
           as $Val,
     );
@@ -156,28 +150,22 @@ class __$$OrcamentoItemModelImplCopyWithImpl<$Res>
       _$OrcamentoItemModelImpl(
         id: freezed == id
             ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as int?,
+            : id                   as int?,
         orcamentoId: freezed == orcamentoId
             ? _value.orcamentoId
-            : orcamentoId // ignore: cast_nullable_to_non_nullable
-                  as int?,
+            : orcamentoId                   as int?,
         descricao: null == descricao
             ? _value.descricao
-            : descricao // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : descricao                   as String,
         tipoOrcamento: null == tipoOrcamento
             ? _value.tipoOrcamento
-            : tipoOrcamento // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : tipoOrcamento                   as String,
         valor: null == valor
             ? _value.valor
-            : valor // ignore: cast_nullable_to_non_nullable
-                  as double,
+            : valor                   as double,
         ativo: null == ativo
             ? _value.ativo
-            : ativo // ignore: cast_nullable_to_non_nullable
-                  as bool,
+            : ativo                   as bool,
       ),
     );
   }

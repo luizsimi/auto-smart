@@ -9,6 +9,7 @@ import {
   ArrayMinSize,
   IsBoolean,
   IsEnum,
+  IsOptional,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { TipoOrcamento } from '@prisma/client';
@@ -72,6 +73,11 @@ export class OrcamentoDto {
   @IsString()
   @IsNotEmpty()
   modelo: string;
+
+  @ApiProperty({ example: null, required: false })
+  @IsOptional()
+  @IsString()
+  fotoVeiculo?: string | null;
 }
 
 // criar orçamento

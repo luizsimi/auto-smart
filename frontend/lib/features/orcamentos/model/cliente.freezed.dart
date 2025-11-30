@@ -70,20 +70,16 @@ class _$ClienteModelCopyWithImpl<$Res, $Val extends ClienteModel>
       _value.copyWith(
             id: freezed == id
                 ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as int?,
+                : id                       as int?,
             nome: null == nome
                 ? _value.nome
-                : nome // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : nome                       as String,
             cpf: null == cpf
                 ? _value.cpf
-                : cpf // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : cpf                       as String,
             telefone: null == telefone
                 ? _value.telefone
-                : telefone // ignore: cast_nullable_to_non_nullable
-                      as String,
+                : telefone                       as String,
           )
           as $Val,
     );
@@ -125,20 +121,16 @@ class __$$ClienteModelImplCopyWithImpl<$Res>
       _$ClienteModelImpl(
         id: freezed == id
             ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as int?,
+            : id                   as int?,
         nome: null == nome
             ? _value.nome
-            : nome // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : nome                   as String,
         cpf: null == cpf
             ? _value.cpf
-            : cpf // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : cpf                   as String,
         telefone: null == telefone
             ? _value.telefone
-            : telefone // ignore: cast_nullable_to_non_nullable
-                  as String,
+            : telefone                   as String,
       ),
     );
   }

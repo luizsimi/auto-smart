@@ -35,8 +35,6 @@ export class ChecklistController {
   ) {
     const { cpf } = req.user as { cpf: string };
 
-    const filesNames = files.map((file) => file.filename);
-    console.log('Files uploaded:', filesNames);
     if (!cpf) throw new UnauthorizedException('Usuário não autenticado');
 
     const result = await this.checklistService.createChecklist(
@@ -46,6 +44,11 @@ export class ChecklistController {
     );
 
     return result;
+  }
+
+  @Get('orcamento/:orcamentoId')
+  async findByOrcamentoId(@Param('orcamentoId') orcamentoId: string) {
+    return await this.checklistService.findByOrcamentoId(Number(orcamentoId));
   }
 
   @Get(':id')

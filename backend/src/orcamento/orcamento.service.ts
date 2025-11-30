@@ -10,8 +10,8 @@ export class OrcamentoService {
     data: {
       orcamento: Omit<
         Orcamento,
-        'id' | 'dataCriacao' | 'status' | 'storeId' | 'criadoPor'
-      >;
+        'id' | 'dataCriacao' | 'status' | 'storeId' | 'criadoPor' | 'fotoVeiculo'
+      > & { fotoVeiculo?: string | null };
       orcamentoItens: Omit<OrcamentoItem, 'id' | 'orcamentoId' | 'ativo'>[];
     },
     cpf: string,
@@ -26,7 +26,12 @@ export class OrcamentoService {
 
     const created = await this.prisma.$transaction(async (tx) => {
       const orcamento = await tx.orcamento.create({
-        data: { ...data.orcamento, storeId: user.storeId, criadoPor: user.id },
+        data: { 
+          ...data.orcamento, 
+          fotoVeiculo: data.orcamento.fotoVeiculo ?? null,
+          storeId: user.storeId, 
+          criadoPor: user.id 
+        },
       });
 
       if (data.orcamentoItens?.length) {
@@ -179,5 +184,18 @@ export class OrcamentoService {
     } catch (error: unknown) {
       throw new BadRequestException(error);
     }
+  }
+
+  async updateFotoVeiculo(id: number, filename: string): Promise<Orcamento> {
+    const orcamento = await this.findOne(id);
+
+    if (!orcamento) {
+      throw new BadRequestException('Orçamento não encontrado');
+    }
+
+    return this.prisma.orcamento.update({
+      where: { id },
+      data: { fotoVeiculo: filename },
+    });
   }
 }

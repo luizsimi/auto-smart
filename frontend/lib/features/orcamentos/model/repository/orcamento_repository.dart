@@ -1,3 +1,4 @@
+import 'package:image_picker/image_picker.dart';
 import '../orcamento_model.dart';
 
 import '../create_orcamento_request.dart';
@@ -25,4 +26,6 @@ abstract interface class OrcamentoRepository {
   );
 
   Future<void> deleteOrcamento(int id);
+
+  Future<OrcamentoModel> updateFotoVeiculo(int id, XFile foto);
 }
