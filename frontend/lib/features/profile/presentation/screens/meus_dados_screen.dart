@@ -3,7 +3,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/custom_bottom_navigation.dart';
 import '../../../../core/theme/colors.dart';
-import '../../../../core/widgets/stat_card.dart';
 import '../../../services/presentation/screens/home_screen.dart';
 import '../../../search/presentation/screens/search_screen.dart';
 import '../../../earnings/presentation/screens/ganhos_screen.dart';
@@ -27,50 +26,42 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
       _showBusinessHoursDialog();
       return;
     }
-    
+
     // Se estiver dentro do horário, abre o WhatsApp normalmente
     _openWhatsAppDirectly();
   }
-  
+
   // Verificar se está dentro do horário de atendimento (8:30 às 17:30)
   bool _isWithinBusinessHours() {
     final now = DateTime.now();
-    
+
     // Verificar se é fim de semana (sábado = 6, domingo = 7)
     if (now.weekday == DateTime.saturday || now.weekday == DateTime.sunday) {
       return false;
     }
-    
+
     // Horário de atendimento: 8:30 às 17:30
     final startTime = DateTime(now.year, now.month, now.day, 8, 30);
     final endTime = DateTime(now.year, now.month, now.day, 17, 30);
-    
+
     return now.isAfter(startTime) && now.isBefore(endTime);
   }
-  
+
   // Mostrar diálogo informando sobre o horário de atendimento
   void _showBusinessHoursDialog() {
     final now = DateTime.now();
-    final isWeekend = now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
-    
+    final isWeekend =
+        now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            Icon(
-              Icons.schedule,
-              color: AppColors.primary,
-              size: 28,
-            ),
+            Icon(Icons.schedule, color: AppColors.primary, size: 28),
             const SizedBox(width: 12),
-            const Text(
-              'Fora do Horário',
-              style: TextStyle(fontSize: 20),
-            ),
+            const Text('Fora do Horário', style: TextStyle(fontSize: 20)),
           ],
         ),
         content: Column(
@@ -152,10 +143,7 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
                   Expanded(
                     child: Text(
                       'Você pode enviar sua mensagem mesmo fora do horário. Responderemos assim que possível!',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[700],
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                     ),
                   ),
                 ],
@@ -187,42 +175,34 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
       ),
     );
   }
-  
+
   // Widget auxiliar para exibir linhas de informação
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
       children: [
         Icon(icon, size: 20, color: Colors.grey[600]),
         const SizedBox(width: 8),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[700],
-          ),
-        ),
+        Text(text, style: TextStyle(fontSize: 14, color: Colors.grey[700])),
       ],
     );
   }
-  
+
   // Abrir WhatsApp diretamente (usada internamente)
   Future<void> _openWhatsAppDirectly() async {
     // CONFIGURAÇÃO: Altere estes valores conforme necessário
-    const phoneNumber = '5519971388231'; // Formato: Código do país + DDD + número (sem espaços ou caracteres especiais)
+    const phoneNumber =
+        '5519971388231'; // Formato: Código do país + DDD + número (sem espaços ou caracteres especiais)
     const message = 'Olá! Preciso de ajuda com o app AUTOSMART.';
-    
+
     // Criar URL do WhatsApp
     final whatsappUrl = Uri.parse(
-      'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}'
+      'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}',
     );
-    
+
     try {
       // Tentar abrir WhatsApp
       if (await canLaunchUrl(whatsappUrl)) {
-        await launchUrl(
-          whatsappUrl,
-          mode: LaunchMode.externalApplication,
-        );
+        await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
       } else {
         // Caso WhatsApp não esteja instalado
         if (!mounted) return;
@@ -240,7 +220,7 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
       );
     }
   }
-  
+
   // Formatar número de telefone para exibição
   String _formatPhoneNumber(String phone) {
     if (phone.length >= 13) {
@@ -252,7 +232,7 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
     }
     return phone;
   }
-  
+
   // Mostrar diálogo de erro
   void _showErrorDialog(String title, String message) {
     showDialog(
@@ -274,10 +254,7 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.secondary,
-      appBar: const CustomAppBar(
-        title: 'MEUS DADOS',
-        showBackButton: false,
-      ),
+      appBar: const CustomAppBar(title: 'MEUS DADOS', showBackButton: false),
       body: Column(
         children: [
           // Header padronizado
@@ -309,54 +286,6 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Cards de Estatísticas
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 0,
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        // Primeira linha
-                        Row(
-                          children: [
-                            Expanded(
-                              child: StatCard(value: '12', label: 'Pendentes'),
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: StatCard(value: '10', label: 'Em Andamento'),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        // Segunda linha
-                        Row(
-                          children: [
-                            Expanded(
-                              child: StatCard(value: '9', label: 'Finalizados'),
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: StatCard(value: 'R\$1000', label: 'Total do Mês'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 30),
-                  
                   // Seção Ações Rápidas
                   const Text(
                     'Ações Rápidas',
@@ -366,9 +295,9 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
                       color: Colors.black87,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 15),
-                  
+
                   // Botão Editar dados Pessoais
                   GestureDetector(
                     onTap: () {
@@ -437,16 +366,18 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 15),
-                  
+
                   // Botão Logout
                   GestureDetector(
                     onTap: () {
                       // Logout mockado - navega para a tela de login
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
                         (route) => false,
                       );
                     },
@@ -520,7 +451,7 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
           setState(() {
             _selectedBottomIndex = index;
           });
-          
+
           // Navegação para Home quando clicar no ícone home
           if (index == 0) {
             Navigator.pushReplacement(
@@ -528,7 +459,7 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
               MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           }
-          
+
           // Navegação para a tela de pesquisa quando clicar no ícone de lupa
           if (index == 1) {
             Navigator.pushReplacement(
@@ -536,7 +467,7 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
               MaterialPageRoute(builder: (context) => const SearchScreen()),
             );
           }
-          
+
           // Navegar para Meus Ganhos ao clicar no ícone de $ (index 2)
           if (index == 2) {
             Navigator.pushReplacement(
@@ -544,7 +475,7 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
               MaterialPageRoute(builder: (context) => const GanhosScreen()),
             );
           }
-          
+
           // Navegação direta - Meus Dados (index 3) já está na tela atual
         },
       ),
@@ -555,7 +486,9 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
           message: 'Fale com o suporte',
           child: FloatingActionButton(
             onPressed: _openWhatsAppSupport,
-            backgroundColor: const Color(0xFF25D366), // Verde oficial do WhatsApp
+            backgroundColor: const Color(
+              0xFF25D366,
+            ), // Verde oficial do WhatsApp
             elevation: 6,
             child: const Icon(
               Icons.support_agent,
@@ -567,5 +500,4 @@ class _MeusDadosScreenState extends State<MeusDadosScreen> {
       ),
     );
   }
-
 }
