@@ -109,6 +109,12 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
   }
 
+  int _getCountByFilterIndex(int filterIndex) {
+    return _orcamentos
+        .where((orcamento) => _matchesFilter(orcamento.status, filterIndex))
+        .length;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,32 +137,40 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: _tabs.asMap().entries.map((entry) {
                 int index = entry.key;
                 String tab = entry.value;
                 bool isSelected = _selectedTabIndex == index;
+                int count = _getCountByFilterIndex(index);
                 
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedTabIndex = index;
-                    });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected ? Colors.white.withOpacity(0.15) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      tab,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                        fontSize: 12,
-                        letterSpacing: 0.5,
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedTabIndex = index;
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Colors.white.withOpacity(0.15) : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$tab ($count)',
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
+                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                            fontSize: 11,
+                            letterSpacing: 0.3,
+                          ),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       ),
                     ),
                   ),
