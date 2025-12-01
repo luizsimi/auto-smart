@@ -940,17 +940,17 @@ class _BudgetScreenState extends State<BudgetScreen> {
                   ),
                   if (_selectedServiceType == 'PEÇAS')
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
+                      padding: const EdgeInsets.only(top: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Container(
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: Colors.grey[300]!),
                             ),
-                            padding: const EdgeInsets.all(12),
                             child: RoundedTextField(
                               label: 'Total de Peças',
                               controller: _totalPartsController,
@@ -963,17 +963,17 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     ),
                   if (_selectedServiceType == 'SERVIÇOS')
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
+                      padding: const EdgeInsets.only(top: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Container(
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: Colors.grey[300]!),
                             ),
-                            padding: const EdgeInsets.all(12),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
