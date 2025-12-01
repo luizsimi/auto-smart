@@ -14,10 +14,7 @@ import '../widgets/part_item_card.dart';
 import '../../../services/presentation/screens/home_screen.dart';
 
 class BudgetScreen extends StatefulWidget {
-  const BudgetScreen({
-    super.key,
-    this.initialCpf,
-  });
+  const BudgetScreen({super.key, this.initialCpf});
 
   final String? initialCpf;
 
@@ -32,7 +29,8 @@ class _BudgetScreenState extends State<BudgetScreen> {
   final TextEditingController _plateController = TextEditingController();
   final TextEditingController _cpfDisplayController = TextEditingController();
   final TextEditingController _totalPartsController = TextEditingController();
-  final TextEditingController _totalServicesController = TextEditingController();
+  final TextEditingController _totalServicesController =
+      TextEditingController();
   final TextEditingController _grandTotalController = TextEditingController();
 
   String _selectedServiceType = 'DADOS';
@@ -52,7 +50,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
     mask: '(##) #####-####',
     filter: {'#': RegExp(r'[0-9]')},
   );
-  
+
   final List<Map<String, TextEditingController>> _partsList = [];
   final List<Map<String, TextEditingController>> _serviceList = [];
 
@@ -89,7 +87,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
     _totalPartsController.dispose();
     _totalServicesController.dispose();
     _grandTotalController.dispose();
-    
+
     for (var part in _partsList) {
       part['name']?.dispose();
       part['value']?.dispose();
@@ -98,7 +96,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
       service['name']?.dispose();
       service['value']?.dispose();
     }
-    
+
     super.dispose();
   }
 
@@ -160,17 +158,22 @@ class _BudgetScreenState extends State<BudgetScreen> {
 
   void _calculateTotal() {
     double totalPartsValue = 0.0;
-    
+
     for (var part in _partsList) {
       String valueText = part['value']?.text ?? '';
-      double partValue = double.tryParse(valueText.replaceAll('R\$', '').replaceAll(',', '.')) ?? 0.0;
+      double partValue =
+          double.tryParse(
+            valueText.replaceAll('R\$', '').replaceAll(',', '.'),
+          ) ??
+          0.0;
       totalPartsValue += partValue;
     }
-    
+
     double totalServicesValue = 0.0;
     for (var service in _serviceList) {
       final valueText = service['value']?.text ?? '';
-      final serviceValue = double.tryParse(
+      final serviceValue =
+          double.tryParse(
             valueText.replaceAll('R\$', '').replaceAll(',', '.'),
           ) ??
           0.0;
@@ -189,9 +192,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
   void _navigateToHome() {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
     );
   }
 
@@ -220,8 +221,10 @@ class _BudgetScreenState extends State<BudgetScreen> {
   bool _validateDadosTab() {
     final missingFields = <String>[];
 
-    final cpfDigits =
-        _cpfDisplayController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final cpfDigits = _cpfDisplayController.text.replaceAll(
+      RegExp(r'[^0-9]'),
+      '',
+    );
     if (cpfDigits.length != 11) {
       missingFields.add('CPF válido');
     } else {
@@ -245,9 +248,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
     }
 
     if (missingFields.isNotEmpty) {
-      _showValidationError(
-        'Preencha: ${missingFields.join(', ')}.',
-      );
+      _showValidationError('Preencha: ${missingFields.join(', ')}.');
       return false;
     }
 
@@ -299,10 +300,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
 
   void _showValidationError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red[700],
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red[700]),
     );
   }
 
@@ -389,9 +387,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
         placa: placa,
         modelo: modelo,
       ),
-      orcamentoItens: OrcamentoItensWrapper(
-        orcamentoItens: itens,
-      ),
+      orcamentoItens: OrcamentoItensWrapper(orcamentoItens: itens),
     );
 
     setState(() {
@@ -413,9 +409,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
       Navigator.pop(context, created);
     } catch (e) {
       if (!mounted) return;
-      _showValidationError(
-        'Falha ao salvar orçamento: ${_friendlyError(e)}',
-      );
+      _showValidationError('Falha ao salvar orçamento: ${_friendlyError(e)}');
     } finally {
       if (mounted) {
         setState(() {
@@ -526,7 +520,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
       final uri = Uri.parse(whatsappUrl);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
-        
+
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -554,69 +548,52 @@ class _BudgetScreenState extends State<BudgetScreen> {
     final clienteNome = _clientNameController.text.trim();
     final veiculo = _vehicleModelController.text.trim();
     final placa = _plateController.text.trim().toUpperCase();
-    
+
     final buffer = StringBuffer();
-    
+
     // Cabeçalho
-    buffer.writeln('🚗 *AUTOSMART - ORÇAMENTO*');
-    buffer.writeln('━━━━━━━━━━━━━━━━━━━━━');
+    buffer.writeln('*AUTOSMART - ORÇAMENTO*');
     buffer.writeln();
-    
+
     // Dados do cliente
-    buffer.writeln('👤 *Cliente:* $clienteNome');
-    buffer.writeln('🚙 *Veículo:* $veiculo');
-    buffer.writeln('🔖 *Placa:* $placa');
+    buffer.writeln('*Cliente:* $clienteNome');
+    buffer.writeln('*Veículo:* $veiculo');
+    buffer.writeln('*Placa:* $placa');
     buffer.writeln();
-    buffer.writeln('━━━━━━━━━━━━━━━━━━━━━');
-    buffer.writeln();
-    
+
     // Peças
     if (_partsList.isNotEmpty) {
-      buffer.writeln('🔧 *PEÇAS:*');
-      buffer.writeln();
+      buffer.writeln('*PEÇAS*');
       for (var i = 0; i < _partsList.length; i++) {
         final part = _partsList[i];
         final nome = part['name']!.text.trim();
         final valor = part['value']!.text.trim();
-        buffer.writeln('${i + 1}. $nome');
-        buffer.writeln('   💰 $valor');
-        if (i < _partsList.length - 1) buffer.writeln();
+        buffer.writeln('• $nome: R\$ $valor');
       }
-      buffer.writeln();
       buffer.writeln('*Subtotal Peças:* ${_totalPartsController.text}');
       buffer.writeln();
-      buffer.writeln('━━━━━━━━━━━━━━━━━━━━━');
-      buffer.writeln();
     }
-    
+
     // Serviços
     if (_serviceList.isNotEmpty) {
-      buffer.writeln('⚙️ *SERVIÇOS:*');
-      buffer.writeln();
+      buffer.writeln('*SERVIÇOS*');
       for (var i = 0; i < _serviceList.length; i++) {
         final service = _serviceList[i];
         final nome = service['name']!.text.trim();
         final valor = service['value']!.text.trim();
-        buffer.writeln('${i + 1}. $nome');
-        buffer.writeln('   💰 $valor');
-        if (i < _serviceList.length - 1) buffer.writeln();
+        buffer.writeln('• $nome: R\$ $valor');
       }
-      buffer.writeln();
       buffer.writeln('*Subtotal Serviços:* ${_totalServicesController.text}');
       buffer.writeln();
-      buffer.writeln('━━━━━━━━━━━━━━━━━━━━━');
-      buffer.writeln();
     }
-    
+
     // Total geral
-    buffer.writeln('💵 *TOTAL DO ORÇAMENTO:* ${_grandTotalController.text}');
+    buffer.writeln('*TOTAL:* ${_grandTotalController.text}');
     buffer.writeln();
-    buffer.writeln('━━━━━━━━━━━━━━━━━━━━━');
-    buffer.writeln();
-    buffer.writeln('📅 *Validade:* 7 dias');
+    buffer.writeln('*Validade:* 15 dias');
     buffer.writeln();
     buffer.writeln('_Orçamento gerado pelo sistema AUTOSMART_');
-    
+
     return buffer.toString();
   }
 
@@ -654,9 +631,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao buscar cliente: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao buscar cliente: $e')));
     } finally {
       if (mounted) {
         setState(() {
@@ -670,10 +647,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: const CustomAppBar(
-        title: 'ORÇAMENTO',
-        showBackButton: true,
-      ),
+      appBar: const CustomAppBar(title: 'ORÇAMENTO', showBackButton: true),
       body: Column(
         children: [
           Container(
@@ -690,7 +664,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: _selectedServiceType == 'DADOS' ? Colors.grey[700] : Colors.transparent,
+                        color: _selectedServiceType == 'DADOS'
+                            ? Colors.grey[700]
+                            : Colors.transparent,
                       ),
                       child: const Text(
                         'DADOS',
@@ -714,7 +690,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: _selectedServiceType == 'PEÇAS' ? Colors.grey[700] : Colors.transparent,
+                        color: _selectedServiceType == 'PEÇAS'
+                            ? Colors.grey[700]
+                            : Colors.transparent,
                       ),
                       child: const Text(
                         'PEÇAS',
@@ -738,7 +716,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: _selectedServiceType == 'SERVIÇOS' ? Colors.grey[700] : Colors.transparent,
+                        color: _selectedServiceType == 'SERVIÇOS'
+                            ? Colors.grey[700]
+                            : Colors.transparent,
                       ),
                       child: const Text(
                         'SERVIÇOS',
@@ -761,9 +741,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
               child: Column(
                 children: [
                   if (_isFetchingCliente)
-                    const LinearProgressIndicator(
-                      minHeight: 2,
-                    ),
+                    const LinearProgressIndicator(minHeight: 2),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
@@ -776,9 +754,13 @@ class _BudgetScreenState extends State<BudgetScreen> {
                               inputFormatters: [_cpfMask],
                               keyboardType: TextInputType.number,
                               onChanged: (value) {
-                                final digits =
-                                    value.replaceAll(RegExp(r'[^0-9]'), '');
-                                _clienteCpf = digits.length == 11 ? digits : null;
+                                final digits = value.replaceAll(
+                                  RegExp(r'[^0-9]'),
+                                  '',
+                                );
+                                _clienteCpf = digits.length == 11
+                                    ? digits
+                                    : null;
                               },
                             ),
                             const SizedBox(height: 12),
@@ -806,8 +788,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                           ] else if (_selectedServiceType == 'PEÇAS') ...[
                             ..._partsList.asMap().entries.map((entry) {
                               int index = entry.key;
-                              Map<String, TextEditingController> part = entry.value;
-                              
+                              Map<String, TextEditingController> part =
+                                  entry.value;
+
                               return PartItemCard(
                                 index: index,
                                 nameController: part['name']!,
@@ -822,7 +805,10 @@ class _BudgetScreenState extends State<BudgetScreen> {
                               margin: const EdgeInsets.only(bottom: 20),
                               child: ElevatedButton.icon(
                                 onPressed: () => _addPart(),
-                                icon: const Icon(Icons.add, color: AppColors.white),
+                                icon: const Icon(
+                                  Icons.add,
+                                  color: AppColors.white,
+                                ),
                                 label: const Text(
                                   'Adicionar Item',
                                   style: TextStyle(
@@ -832,7 +818,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                                 ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -853,16 +841,20 @@ class _BudgetScreenState extends State<BudgetScreen> {
                                     decoration: BoxDecoration(
                                       color: Colors.grey[100],
                                       borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.grey[200]!),
+                                      border: Border.all(
+                                        color: Colors.grey[200]!,
+                                      ),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
                                             CircleAvatar(
                                               radius: 12,
-                                              backgroundColor: AppColors.primary,
+                                              backgroundColor:
+                                                  AppColors.primary,
                                               child: Text(
                                                 '${index + 1}',
                                                 style: const TextStyle(
@@ -882,8 +874,11 @@ class _BudgetScreenState extends State<BudgetScreen> {
                                             const Spacer(),
                                             if (_serviceList.length > 1)
                                               IconButton(
-                                                onPressed: () => _removeService(index),
-                                                icon: const Icon(Icons.delete_outline),
+                                                onPressed: () =>
+                                                    _removeService(index),
+                                                icon: const Icon(
+                                                  Icons.delete_outline,
+                                                ),
                                                 color: Colors.redAccent,
                                               ),
                                           ],
@@ -900,7 +895,8 @@ class _BudgetScreenState extends State<BudgetScreen> {
                                           controller: service['value'],
                                           keyboardType:
                                               const TextInputType.numberWithOptions(
-                                                  decimal: true),
+                                                decimal: true,
+                                              ),
                                           onChanged: (_) => _calculateTotal(),
                                         ),
                                       ],
@@ -915,7 +911,10 @@ class _BudgetScreenState extends State<BudgetScreen> {
                               margin: const EdgeInsets.only(bottom: 20),
                               child: ElevatedButton.icon(
                                 onPressed: () => _addService(),
-                                icon: const Icon(Icons.add, color: AppColors.white),
+                                icon: const Icon(
+                                  Icons.add,
+                                  color: AppColors.white,
+                                ),
                                 label: const Text(
                                   'Adicionar Serviço',
                                   style: TextStyle(
@@ -925,7 +924,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                                 ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -1031,15 +1032,21 @@ class _BudgetScreenState extends State<BudgetScreen> {
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
                                     ),
                                     disabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
                                     ),
                                     filled: true,
                                     fillColor: Colors.green[50],
@@ -1061,19 +1068,25 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: _isSendingWhatsApp ? null : _sendBudgetViaWhatsApp,
+                        onPressed: _isSendingWhatsApp
+                            ? null
+                            : _sendBudgetViaWhatsApp,
                         icon: _isSendingWhatsApp
                             ? const SizedBox(
                                 height: 18,
                                 width: 18,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
                                 ),
                               )
                             : const Icon(Icons.chat, color: Colors.white),
                         label: Text(
-                          _isSendingWhatsApp ? 'Enviando...' : 'Enviar Orçamento via WhatsApp',
+                          _isSendingWhatsApp
+                              ? 'Enviando...'
+                              : 'Enviar Orçamento via WhatsApp',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -1081,7 +1094,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF25D366), // Cor oficial do WhatsApp
+                          backgroundColor: const Color(
+                            0xFF25D366,
+                          ), // Cor oficial do WhatsApp
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25),
@@ -1108,8 +1123,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                               width: 22,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : Text(
